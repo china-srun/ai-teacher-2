@@ -1,0 +1,31 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-helloai-dev-190416-authRole",
+      "UnauthRoleArn": "arn:aws:iam::570079491183:role/amplify-helloai-dev-190416-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::570079491183:role/amplify-helloai-dev-190416-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-helloai-dev-190416-deployment",
+      "UnauthRoleName": "amplify-helloai-dev-190416-unauthRole",
+      "StackName": "amplify-helloai-dev-190416",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:570079491183:stack/amplify-helloai-dev-190416/9c45c000-05f4-11ee-a377-0e7b3d737ad1",
+      "AmplifyAppId": "d1nyd4373bs73v"
+    },
+    "categories": {
+      "auth": {
+        "helloaibc6272d5": {}
+      },
+      "hosting": {
+        "S3AndCloudFront": {},
+        "amplifyhosting": {
+          "appId": "d1nyd4373bs73v",
+          "type": "manual"
+        }
+      },
+      "predictions": {
+        "texttoaudio": {},
+        "audiototext": {}
+      }
+    }
+  }
+}

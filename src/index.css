@@ -1,0 +1,178 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.TextToSpeech h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.TextToSpeech button,
+.audioRecorder button {
+  font-size: 18px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(102, 100, 100);
+  color: #fff;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+
+.avatar {
+  height: 80vh; 
+  width: auto;
+  margin-bottom: 20px; 
+}
+
+.avatarContainer {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+}
+
+.buttonsContainer {
+  display: flex; 
+  flex-direction: row; 
+  justify-content: center; 
+  align-items: center;
+  width: 100%;
+  margin-top: 20px; 
+}
+
+.buttonsContainer button {
+  margin: 5px;
+  margin-top: 10px; 
+
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row; 
+}
+
+
+.textToSpeechContainer {
+  display: flex;
+  flex-direction: column; 
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 20px;
+}
+
+.textToSpeechContainer > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.chatContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.dropdown {
+  width: 300px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+  background-color: white;
+}
+
+.dropdown-header {
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-body {
+  padding: 5px;
+  border-top: 1px solid #E5E8EC;
+  display: none;
+}
+
+.dropdown-body.open {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px;
+}
+
+.dropdown-item:hover {
+  cursor: pointer;
+}
+
+.dropdown-item-dot {
+  opacity: 0;
+  color: #91A5BE;
+  transition: all .2s ease-in-out;
+}
+
+.dropdown-item-dot.selected {
+  opacity: 1;
+}
+
+.icon {
+  font-size: 13px;
+  color: #91A5BE;
+  transform: rotate(0deg);
+  transition: all .2s ease-in-out;
+}
+
+.icon.open {
+  transform: rotate(90deg);
+}
+/* Media query for responsiveness */
+@media (min-width: 768px) {
+  /* On screens with minimum width of 768px (e.g., tablets and larger screens) */
+  .container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .textToSpeechContainer {
+    margin-right: 20px;
+    width: 30%;
+  }
+
+  .chatContainer {
+    width: 70%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* On screens with maximum width of 768px (e.g., mobile devices) */
+  .avatar {
+    height: 50vh; /* Adjust the height as per your requirement for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  /* On screens with maximum width of 480px (e.g., small mobile devices) */
+  .avatar {
+    height: 40vh; /* Adjust the height as per your requirement for even smaller screens */
+  }
+}
