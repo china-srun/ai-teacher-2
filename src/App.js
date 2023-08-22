@@ -307,6 +307,7 @@ function App() {
 		{ id: 0, label: "Japanese" },
 		{ id: 1, label: "English" }
 	];
+	
 
 	const Dropdown = () => {
 		const [isOpen, setOpen] = useState(false);
@@ -385,6 +386,8 @@ function App() {
 					</div>
 				</div>
 			</div>
+			
+			
 		</div>
 	);
 }
