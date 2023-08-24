@@ -145,8 +145,10 @@ code {
 .icon.open {
   transform: rotate(90deg);
 }
+
+
 /* Media query for responsiveness */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   /* On screens with minimum width of 768px (e.g., tablets and larger screens) */
   .container {
     flex-direction: row;
@@ -163,10 +165,10 @@ code {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   /* On screens with maximum width of 768px (e.g., mobile devices) */
   .avatar {
-    height: 50vh; /* Adjust the height as per your requirement for smaller screens */
+    height: 30vh; /* Adjust the height as per your requirement for smaller screens */
   }
 }
 
