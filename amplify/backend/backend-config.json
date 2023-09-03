@@ -1,6 +1,6 @@
 {
   "auth": {
-    "helloaibc6272d5": {
+    "aiteacher109055a7f09055a7f": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -16,9 +16,11 @@
           "EMAIL"
         ],
         "socialProviders": [],
-        "usernameAttributes": [],
-        "verificationMechanisms": [
+        "usernameAttributes": [
           "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "PHONE_NUMBER"
         ]
       },
       "providerPlugin": "awscloudformation",
@@ -51,15 +53,15 @@
     }
   },
   "predictions": {
-    "audiototext": {
-      "convertType": "transcription",
-      "providerPlugin": "awscloudformation",
-      "service": "Transcribe"
-    },
-    "texttoaudio": {
+    "speechGenerator64d89c39": {
       "convertType": "speechGenerator",
       "providerPlugin": "awscloudformation",
       "service": "Polly"
+    },
+    "transcriptione664065f": {
+      "convertType": "transcription",
+      "providerPlugin": "awscloudformation",
+      "service": "Transcribe"
     }
   }
 }

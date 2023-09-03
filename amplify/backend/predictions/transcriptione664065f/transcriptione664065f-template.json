@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"10.5.1\",\"stackType\":\"predictions-Polly\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.0.3\",\"stackType\":\"predictions-Transcribe\",\"metadata\":{}}",
   "Parameters": {
     "authRoleName": {
       "Type": "String"
@@ -21,9 +21,6 @@
       "Type": "String"
     },
     "language": {
-      "Type": "String"
-    },
-    "voice": {
       "Type": "String"
     },
     "env": {
@@ -58,11 +55,6 @@
       "Value": {
         "Ref": "language"
       }
-    },
-    "voice": {
-      "Value": {
-        "Ref": "voice"
-      }
     }
   },
   "Resources": {
@@ -96,7 +88,10 @@
             {
               "Effect": "Allow",
               "Action": [
-                "polly:SynthesizeSpeech"
+                "transcribe:GetTranscriptionJob",
+                "transcribe:StartStreamTranscription",
+                "transcribe:StartStreamTranscriptionWebSocket",
+                "transcribe:StartTranscriptionJob"
               ],
               "Resource": "*"
             }
@@ -108,55 +103,58 @@
   "Mappings": {
     "RegionMapping": {
       "us-east-1": {
-        "speechGenerator": "us-east-1"
+        "transcription": "us-east-1"
       },
       "us-east-2": {
-        "speechGenerator": "us-east-2"
+        "transcription": "us-east-2"
       },
       "us-west-1": {
-        "speechGenerator": "us-west-1"
+        "transcription": "us-west-1"
       },
       "us-west-2": {
-        "speechGenerator": "us-west-2"
+        "transcription": "us-west-2"
       },
       "ca-central-1": {
-        "speechGenerator": "ca-central-1"
+        "transcription": "ca-central-1"
       },
       "eu-west-1": {
-        "speechGenerator": "eu-west-1"
+        "transcription": "eu-west-1"
       },
       "eu-west-2": {
-        "speechGenerator": "eu-west-2"
+        "transcription": "eu-west-2"
       },
       "eu-west-3": {
-        "speechGenerator": "eu-west-3"
+        "transcription": "eu-west-3"
       },
       "eu-central-1": {
-        "speechGenerator": "eu-central-1"
+        "transcription": "eu-central-1"
       },
       "eu-north-1": {
-        "speechGenerator": "eu-north-1"
+        "transcription": "eu-central-1"
+      },
+      "eu-south-1": {
+        "transcription": "eu-central-1"
       },
       "ap-northeast-1": {
-        "speechGenerator": "ap-northeast-1"
+        "transcription": "ap-northeast-1"
       },
       "ap-northeast-2": {
-        "speechGenerator": "ap-northeast-2"
+        "transcription": "ap-northeast-2"
       },
       "ap-southeast-1": {
-        "speechGenerator": "ap-southeast-1"
+        "transcription": "ap-southeast-1"
       },
       "ap-southeast-2": {
-        "speechGenerator": "ap-southeast-2"
+        "transcription": "ap-southeast-2"
       },
       "ap-south-1": {
-        "speechGenerator": "ap-south-1"
+        "transcription": "ap-south-1"
       },
       "me-south-1": {
-        "speechGenerator": "me-south-1"
+        "transcription": "me-south-1"
       },
       "sa-east-1": {
-        "speechGenerator": "sa-east-1"
+        "transcription": "sa-east-1"
       }
     }
   }

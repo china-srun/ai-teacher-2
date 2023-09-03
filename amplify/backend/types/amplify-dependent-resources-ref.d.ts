@@ -1,8 +1,9 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
-    "helloaibc6272d5": {
+    "aiteacher109055a7f09055a7f": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
+      "CreatedSNSRole": "string",
       "IdentityPoolId": "string",
       "IdentityPoolName": "string",
       "UserPoolArn": "string",
@@ -11,14 +12,14 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "predictions": {
-    "audiototext": {
-      "language": "string",
-      "region": "string"
-    },
-    "texttoaudio": {
+    "speechGenerator64d89c39": {
       "language": "string",
       "region": "string",
       "voice": "string"
+    },
+    "transcriptione664065f": {
+      "language": "string",
+      "region": "string"
     }
   }
 }
