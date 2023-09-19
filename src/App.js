@@ -20,6 +20,7 @@ import awsconfig from "./aws-exports";
 import mic from "microphone-stream";
 import avatar from './assets/bg_character_.png';
 
+
 Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
@@ -251,7 +252,63 @@ function App() {
 		);
 	}
 
+	// async function processMessage(chatMessage) {
+	// 	let apiMessages = chatMessage.map((messageObject) => {
+	// 		let role = "";
+	// 		if (messageObject.sender === "ChatGPT") {
+	// 			role = "assistant";
+	// 		} else {
+	// 			role = "user";
+	// 		}
+	// 		return { role: role, content: messageObject.message };
+	// 	});
+
+	// 	// role: "user" => a message from the user
+	// 	// role: "assistant" => a message from the chatGPT
+	// 	// role: "system" => how we define chatGPT to talk
+
+	// 	const systemMessage = {
+	// 		role: "system",
+	// 		content: "Pretend you are my teacher and try to make the response a little shorter"
+	// 		// content:
+	// 		// 	"Pretend you are my teacher and response in Japanese. Please provide the english version below the japanese version",
+	// 	};
+
+	// 	const apiRequestBody = {
+	// 		model: "gpt-3.5-turbo",
+	// 		messages: [systemMessage, ...apiMessages],
+	// 	};
+	// 	await fetch("https://api.openai.com/v1/chat/completions", {
+	// 		method: "POST",
+	// 		headers: {
+	// 			Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify(apiRequestBody),
+	// 	})
+	// 		.then((data) => {
+	// 			// for (const chunk in data) {
+	// 			// 	console.log(chunk)
+	// 			// }
+	// 			return data.json();
+	// 		})
+	// 		.then((data) => {
+	// 			setMessages([
+	// 				...chatMessage,
+	// 				{
+	// 					message: data.choices[0].message.content,
+	// 					sender: "ChatGPT",
+	// 				},
+	// 			]);
+	// 			setTyping(false);
+	// 			setGeneratedText(data.choices[0].message.content);
+	// 			setGeneratedText("");
+
+	// 		});
+	// }
+
 	async function processMessage(chatMessage) {
+		const decoder = new TextDecoder("utf-8");
 		let apiMessages = chatMessage.map((messageObject) => {
 			let role = "";
 			if (messageObject.sender === "ChatGPT") {
@@ -276,38 +333,61 @@ function App() {
 		const apiRequestBody = {
 			model: "gpt-3.5-turbo",
 			messages: [systemMessage, ...apiMessages],
+			stream: true,
+			max_tokens: 100,
 		};
-		await fetch("https://api.openai.com/v1/chat/completions", {
+		const res = await fetch("https://api.openai.com/v1/chat/completions", {
 			method: "POST",
 			headers: {
 				Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(apiRequestBody),
-		})
-			.then((data) => {
-				return data.json();
-			})
-			.then((data) => {
-				setMessages([
-					...chatMessage,
-					{
-						message: data.choices[0].message.content,
-						sender: "ChatGPT",
-					},
-				]);
-				setTyping(false);
-				setGeneratedText(data.choices[0].message.content);
-				setGeneratedText("");
 
-			});
+		})
+		const reader = res.body.getReader();
+		let accumulatedContent = "";
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) {
+				break;
+			}
+			// Massage and parse the chunk of data
+			const chunk = decoder.decode(value);
+			const lines = chunk.split('\n');
+			const parsedLines = lines
+				.map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
+				.filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
+				.map((line) => JSON.parse(line)); // Parse the JSON string
+
+			for (const parsedLine of parsedLines) {
+				const { choices } = parsedLine;
+				const { delta } = choices[0];
+				const { content } = delta;
+				// Update the UI with the new content
+				if (content) {
+					accumulatedContent += content; // Accumulate content
+					setMessages([
+						...chatMessage,
+						{
+							message: accumulatedContent, // Use accumulated content
+							sender: "ChatGPT",
+						},
+					]);
+					setTyping(false);
+
+				}
+			}
+		}
+		setGeneratedText(accumulatedContent);
+		setGeneratedText("")
 	}
 
 	const data = [
 		{ id: 0, label: "Japanese" },
 		{ id: 1, label: "English" }
 	];
-	
+
 
 	const Dropdown = () => {
 		const [isOpen, setOpen] = useState(false);
@@ -386,8 +466,8 @@ function App() {
 					</div>
 				</div>
 			</div>
-			
-			
+
+
 		</div>
 	);
 }
