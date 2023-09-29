@@ -12,6 +12,8 @@ import {
 	MessageInput,
 	TypingIndicator,
 	Avatar,
+	ConversationHeader,
+
 } from "@chatscope/chat-ui-kit-react";
 import React, { useState, useEffect } from "react";
 import { Amplify, Predictions } from "aws-amplify";
@@ -50,92 +52,381 @@ function App() {
 		await processMessage(newMessages);
 	};
 
+	// function SpeechToText(props) {
+	// 	const [response, setResponse] = useState();
+
+	// 	function AudioRecorder(props) {
+	// 		const [recording, setRecording] = useState(false);
+	// 		const [micStream, setMicStream] = useState();
+	// 		const [audioBuffer] = useState(
+	// 			(function () {
+	// 				let buffer = [];
+	// 				function add(raw) {
+	// 					buffer = buffer.concat(...raw);
+	// 					return buffer;
+	// 				}
+	// 				function newBuffer() {
+	// 					console.log("resetting buffer");
+	// 					buffer = [];
+	// 				}
+
+	// 				return {
+	// 					reset: function () {
+	// 						newBuffer();
+	// 					},
+	// 					addData: function (raw) {
+	// 						return add(raw);
+	// 					},
+	// 					getData: function () {
+	// 						return buffer;
+	// 					},
+	// 				};
+	// 			})()
+	// 		);
+
+	// 		async function startRecording() {
+	// 			console.log("start recording");
+	// 			audioBuffer.reset();
+	// 			window.navigator.mediaDevices
+	// 				.getUserMedia({ video: false, audio: true })
+	// 				.then((stream) => {
+	// 					const startMic = new mic();
+
+	// 					startMic.setStream(stream);
+	// 					startMic.on("data", (chunk) => {
+	// 						var raw = mic.toRaw(chunk);
+	// 						if (raw == null) {
+	// 							return;
+	// 						}
+	// 						audioBuffer.addData(raw);
+	// 					});
+
+	// 					setRecording(true);
+	// 					setMicStream(startMic);
+
+	// 				});
+	// 		}
+
+	// 		async function stopRecording() {
+	// 			console.log("stop recording");
+	// 			const { finishRecording } = props;
+
+	// 			micStream.stop();
+	// 			setMicStream(null);
+	// 			setRecording(false);
+
+	// 			const resultBuffer = audioBuffer.getData();
+
+	// 			if (typeof finishRecording === "function") {
+	// 				finishRecording(resultBuffer);
+	// 			}
+	// 		}
+
+	// 		return (
+	// 			<div className="audioRecorder">
+	// 				<div>
+	// 					{recording ? (
+	// 						<button onClick={stopRecording} title="Stop Recording">
+	// 							<FontAwesomeIcon icon={faSpinner} spin /> {/* Show the spinning icon while processing */}
+	// 						</button>
+	// 					) : (
+	// 						<button onClick={startRecording} title="Start Recording">
+	// 							<FontAwesomeIcon icon={faMicrophone} /> {/* Show the microphone icon when not recording */}
+	// 						</button>
+	// 					)}
+	// 				</div>
+	// 			</div>
+	// 		);
+	// 	}
+
+	// 	function convertFromBuffer(bytes) {
+	// 		setResponse("Converting text...");
+	// 		setConvertProcess(true);
+	// 		Predictions.convert({
+	// 			transcription: {
+	// 				source: {
+	// 					bytes,
+	// 				},
+	// 				// language: "ja-JP",
+	// 				// language: "en-US", // other options are "en-GB", "fr-FR", "fr-CA", "es-US"
+	// 				language: (() => {
+	// 					if (selectedItem === 0) {
+	// 						console.log(selectedItem)
+	// 						return "ja-JP";
+	// 					} else if (selectedItem === 1) {
+	// 						return "en-US";
+	// 					}
+	// 					// Add additional conditions here if needed
+	// 					return "en-US"; // Provide a default language code
+	// 				})()
+
+	// 			},
+
+	// 		})
+	// 			.then(({ transcription: { fullText } }) => {
+	// 				handleSend(fullText);
+	// 				setConvertProcess(false);
+	// 			})
+	// 			.catch((err) => setResponse(JSON.stringify(err, null, 2)));
+	// 	}
+
+	// 	return (
+	// 		<div className="Text">
+	// 			<div>
+	// 				<AudioRecorder finishRecording={convertFromBuffer} />
+	// 			</div>
+	// 		</div>
+	// 	);
+	// }
+
 	function SpeechToText(props) {
 		const [response, setResponse] = useState();
 
 		function AudioRecorder(props) {
 			const [recording, setRecording] = useState(false);
 			const [micStream, setMicStream] = useState();
-			const [audioBuffer] = useState(
-				(function () {
-					let buffer = [];
-					function add(raw) {
-						buffer = buffer.concat(...raw);
+			const [audioBuffer] = useState(() => {
+				let buffer = [];
+				function add(raw) {
+					buffer = buffer.concat(...raw);
+					return buffer;
+				}
+				function newBuffer() {
+					console.log('resetting buffer');
+					buffer = [];
+				}
+
+				return {
+					reset: function () {
+						newBuffer();
+					},
+					addData: function (raw) {
+						return add(raw);
+					},
+					getData: function () {
 						return buffer;
-					}
-					function newBuffer() {
-						console.log("resetting buffer");
-						buffer = [];
-					}
+					},
+				};
+			});
 
-					return {
-						reset: function () {
-							newBuffer();
-						},
-						addData: function (raw) {
-							return add(raw);
-						},
-						getData: function () {
-							return buffer;
-						},
-					};
-				})()
-			);
+			const durationOptions = [3, 5, 10, 15]; // Available recording duration options
+			const [selectedDuration, setSelectedDuration] = useState(3);
+			const [isOpen, setOpen] = useState(false);
 
-			async function startRecording() {
-				console.log("start recording");
+			const toggleDropdown = () => setOpen(!isOpen);
+
+			useEffect(() => {
+				let timer;
+				if (recording && selectedDuration > 0) {
+					timer = setInterval(() => {
+						setSelectedDuration((prevDuration) => prevDuration - 1);
+					}, 1000);
+				} else if (selectedDuration === 0) {
+					stopRecording();
+					setSelectedDuration(0); // Reset the timer to 0 when it reaches zero
+				}
+
+				return () => clearInterval(timer);
+			}, [recording, selectedDuration]);
+
+			const startRecording = async () => {
+				console.log('start recording');
 				audioBuffer.reset();
-				window.navigator.mediaDevices
-					.getUserMedia({ video: false, audio: true })
-					.then((stream) => {
-						const startMic = new mic();
+				setSelectedDuration(selectedDuration); // Use the selected duration
+				try {
+					const stream = await window.navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+					const startMic = new mic();
 
-						startMic.setStream(stream);
-						startMic.on("data", (chunk) => {
-							var raw = mic.toRaw(chunk);
-							if (raw == null) {
-								return;
-							}
-							audioBuffer.addData(raw);
-						});
-
-						setRecording(true);
-						setMicStream(startMic);
-
+					startMic.setStream(stream);
+					startMic.on('data', (chunk) => {
+						var raw = mic.toRaw(chunk);
+						if (raw == null) {
+							return;
+						}
+						audioBuffer.addData(raw);
 					});
-			}
 
-			async function stopRecording() {
-				console.log("stop recording");
+					setRecording(true);
+					setMicStream(startMic);
+				} catch (error) {
+					console.error('Error starting recording:', error);
+				}
+			};
+
+			const stopRecording = () => {
+				console.log('stop recording');
 				const { finishRecording } = props;
 
-				micStream.stop();
-				setMicStream(null);
-				setRecording(false);
+				if (micStream) {
+					micStream.stop();
+					setMicStream(null);
+				}
 
+				setRecording(false);
 				const resultBuffer = audioBuffer.getData();
 
-				if (typeof finishRecording === "function") {
+				if (typeof finishRecording === 'function') {
 					finishRecording(resultBuffer);
 				}
-			}
+			};
+
+			const handleDurationChange = (duration) => {
+				setSelectedDuration(duration);
+				toggleDropdown(); // Close the dropdown when a duration is selected
+			};
 
 			return (
 				<div className="audioRecorder">
-					<div>
-						{recording ? (
+					{recording ? (
+						<>
 							<button onClick={stopRecording} title="Stop Recording">
-								<FontAwesomeIcon icon={faSpinner} spin /> {/* Show the spinning icon while processing */}
+								<FontAwesomeIcon icon={faSpinner} spin />
 							</button>
-						) : (
+							<div>Time Left: {selectedDuration} seconds</div>
+						</>
+					) : (
+						<>
 							<button onClick={startRecording} title="Start Recording">
-								<FontAwesomeIcon icon={faMicrophone} /> {/* Show the microphone icon when not recording */}
+								<FontAwesomeIcon icon={faMicrophone} />
 							</button>
-						)}
-					</div>
+							<div className="dropdown">
+								<div className="dropdown-header" onClick={toggleDropdown}>
+									{selectedDuration} seconds
+									<FontAwesomeIcon icon={faChevronRight} className={`icon ${isOpen && 'open'}`} />
+								</div>
+								<div className={`dropdown-body ${isOpen && 'open'}`}>
+									{durationOptions.map((duration) => (
+										<div
+											className={`dropdown-item ${duration === selectedDuration && 'selected'}`}
+											onClick={() => handleDurationChange(duration)}
+											key={duration}
+										>
+											{duration} seconds
+										</div>
+									))}
+								</div>
+							</div>
+						</>
+					)}
 				</div>
 			);
 		}
+
+		// function AudioRecorder(props) {
+		// 	const [recording, setRecording] = useState(false);
+		// 	const [micStream, setMicStream] = useState();
+		// 	const [audioBuffer] = useState(() => {
+		// 		let buffer = [];
+		// 		function add(raw) {
+		// 			buffer = buffer.concat(...raw);
+		// 			return buffer;
+		// 		}
+		// 		function newBuffer() {
+		// 			console.log('resetting buffer');
+		// 			buffer = [];
+		// 		}
+
+		// 		return {
+		// 			reset: function () {
+		// 				newBuffer();
+		// 			},
+		// 			addData: function (raw) {
+		// 				return add(raw);
+		// 			},
+		// 			getData: function () {
+		// 				return buffer;
+		// 			},
+		// 		};
+		// 	});
+		// 	const [recordTimer, setRecordTimer] = useState(3); // Default recording duration in seconds
+
+		// 	const durationOptions = [3, 5, 10, 15]; // Available recording duration options
+
+		// 	useEffect(() => {
+		// 		let timer;
+		// 		if (recording && recordTimer > 0) {
+		// 			timer = setInterval(() => {
+		// 				setRecordTimer((prevTime) => prevTime - 1);
+		// 			}, 1000);
+		// 		} else if (recordTimer === 0) {
+		// 			stopRecording();
+		// 		}
+
+		// 		return () => clearInterval(timer);
+		// 	}, [recording, recordTimer]);
+
+		// 	async function startRecording() {
+		// 		console.log('start recording');
+		// 		audioBuffer.reset();
+		// 		window.navigator.mediaDevices
+		// 			.getUserMedia({ video: false, audio: true })
+		// 			.then((stream) => {
+		// 				const startMic = new mic();
+
+		// 				startMic.setStream(stream);
+		// 				startMic.on('data', (chunk) => {
+		// 					var raw = mic.toRaw(chunk);
+		// 					if (raw == null) {
+		// 						return;
+		// 					}
+		// 					audioBuffer.addData(raw);
+		// 				});
+
+		// 				setRecording(true);
+		// 				setMicStream(startMic);
+		// 			});
+		// 	}
+
+		// 	async function stopRecording() {
+		// 		console.log('stop recording');
+		// 		const { finishRecording } = props;
+
+		// 		micStream.stop();
+		// 		setMicStream(null);
+		// 		setRecording(false);
+
+		// 		const resultBuffer = audioBuffer.getData();
+
+		// 		if (typeof finishRecording === 'function') {
+		// 			finishRecording(resultBuffer);
+		// 		}
+		// 	}
+
+		// 	function handleDurationChange(event) {
+		// 		const selectedDuration = parseInt(event.target.value, 10);
+		// 		setRecordTimer(selectedDuration);
+		// 	}
+
+		// 	return (
+		// 		<div className="audioRecorder">
+		// 			{recording ? (
+		// 				<>
+		// 					<button onClick={stopRecording} title="Stop Recording">
+		// 						<FontAwesomeIcon icon={faSpinner} spin />
+		// 					</button>
+		// 					<div>Time Left: {recordTimer} seconds</div>
+		// 				</>
+		// 			) : (
+		// 				<>
+		// 					<button onClick={startRecording} title="Start Recording">
+		// 						<FontAwesomeIcon icon={faMicrophone} />
+		// 					</button>
+		// 					<div>
+		// 						Recording Duration:
+		// 						<select value={recordTimer} onChange={handleDurationChange}>
+		// 							{durationOptions.map((duration) => (
+		// 								<option key={duration} value={duration}>
+		// 									{duration} seconds
+		// 								</option>
+		// 							))}
+		// 						</select>
+		// 					</div>
+		// 				</>
+		// 			)}
+		// 		</div>
+		// 	);
+		// }
+
 
 		function convertFromBuffer(bytes) {
 			setResponse("Converting text...");
@@ -176,6 +467,7 @@ function App() {
 			</div>
 		);
 	}
+
 
 	function TextToSpeech({ generatedText }) {
 		const [response, setResponse] = useState("...");
@@ -222,6 +514,7 @@ function App() {
 						(buffer) => {
 							source.buffer = buffer;
 							source.connect(audioCtx.destination);
+							// source.playbackRate.value = 5;
 							source.start(0);
 						},
 						(err) => console.log({ err })
@@ -231,6 +524,7 @@ function App() {
 				})
 				.catch((err) => setResponse(err));
 		}
+
 
 		return (
 			// <div className="TextToSpeech">
@@ -366,6 +660,7 @@ function App() {
 				const { content } = delta;
 				// Update the UI with the new content
 				if (content) {
+
 					accumulatedContent += content; // Accumulate content
 					setMessages([
 						...chatMessage,
@@ -383,13 +678,14 @@ function App() {
 		setGeneratedText("")
 	}
 
+
 	const data = [
 		{ id: 0, label: "Japanese" },
 		{ id: 1, label: "English" }
 	];
 
 
-	const Dropdown = () => {
+	const LanguageDropdown = () => {
 		const [isOpen, setOpen] = useState(false);
 		const [items, setItem] = useState(data);
 		const toggleDropdown = () => setOpen(!isOpen);
@@ -401,7 +697,7 @@ function App() {
 
 
 		return (
-			<div className='dropdown'>
+			<div className='dropdown' style={{ width: '37%' }}>
 				<div className='dropdown-header' onClick={toggleDropdown}>
 					{items.find(item => item.id === selectedItem).label}
 					<FontAwesomeIcon icon={faChevronRight} className={`icon ${isOpen && "open"}`} />
@@ -418,6 +714,7 @@ function App() {
 		)
 	}
 
+
 	return (
 		<div className="App">
 			<div className="container">
@@ -429,7 +726,7 @@ function App() {
 						<div className="buttons">
 							<SpeechToText />
 							<TextToSpeech generatedText={generatedText} />
-							<Dropdown />
+							<LanguageDropdown />
 						</div>
 					</div>
 				</div>
@@ -437,6 +734,10 @@ function App() {
 					<div style={{ height: "100vh" }}>
 						<MainContainer>
 							<ChatContainer>
+								<ConversationHeader>
+									<Avatar src={logo} name="Akane" />
+									<ConversationHeader.Content userName="Teacher" info="Active Now" />
+								</ConversationHeader>
 								<MessageList
 									scrollBehavior="smooth"
 									typingIndicator={
@@ -448,7 +749,7 @@ function App() {
 								>
 									{messages.map((message, index) => {
 										return (
-											<Message key={index} model={message}>
+											<Message key={index} model={message} >
 												<Avatar src={logo} name="Joe" size="md" />
 											</Message>
 										);

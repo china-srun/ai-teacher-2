@@ -12,10 +12,7 @@ code {
     monospace;
 }
 
-.TextToSpeech h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
+
 
 .TextToSpeech button,
 .audioRecorder button {
@@ -48,52 +45,38 @@ code {
   align-items: center;
 }
 
-.buttonsContainer {
-  display: flex; 
-  flex-direction: row; 
-  justify-content: center; 
-  align-items: center;
-  width: 100%;
-  margin-top: 20px; 
-}
+
 
 .buttonsContainer button {
   margin: 5px;
   margin-top: 10px; 
-
 }
+
+
+
 
 .buttons {
   display: flex;
   flex-direction: row; 
+  justify-content: space-around;
 }
 
 
-.textToSpeechContainer {
-  display: flex;
-  flex-direction: column; 
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  margin-bottom: 20px;
-}
-
-.textToSpeechContainer > div {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-}
 
 .chatContainer {
   width: 100%;
   height: 100%;
 }
 
+
+.audioRecorder {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
 .dropdown {
-  width: 300px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0,0,0,.1);
   background-color: white;
