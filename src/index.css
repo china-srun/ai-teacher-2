@@ -61,6 +61,12 @@ code {
   justify-content: space-around;
 }
 
+.themeContainer {
+  display: flex;
+  width: 70%;
+  justify-content: space-between;
+}
+
 
 
 .chatContainer {

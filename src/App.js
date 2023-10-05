@@ -28,6 +28,7 @@ Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
 function App() {
 	const [selectedItem, setSelectedItem] = useState(0);
+	const [selectedTheme, setSelectedTheme] = useState(0);
 	const [textToSpeechEnabled, setTextToSpeechEnabled] = useState(true); // Add state to control the text-to-speech function
 	const [generatedText, setGeneratedText] = useState("");
 	const [typing, setTyping] = useState(false);
@@ -617,9 +618,19 @@ function App() {
 		// role: "assistant" => a message from the chatGPT
 		// role: "system" => how we define chatGPT to talk
 
+		var content = ""
+		if (selectedTheme === 0) {
+			content = "You are an AI"
+		} else if (selectedTheme === 1) {
+			content = "You are free to say anything"
+		} else if (selectedTheme === 2) {
+			content = "I want you to act as a barista from nakama cafe, you will communicate with me as a barista to a client. And don't mention barista for the response"
+		} else if (selectedTheme === 3) {
+			content = "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects"
+		}
 		const systemMessage = {
 			role: "system",
-			content: "Pretend you are my teacher and try to make the response a little shorter"
+			content: content
 			// content:
 			// 	"Pretend you are my teacher and response in Japanese. Please provide the english version below the japanese version",
 		};
@@ -714,12 +725,55 @@ function App() {
 		)
 	}
 
+	const theme = [
+		{ id: 0, label: "Choose Theme" },
+		{ id: 1, label: "Free Talk" },
+		{ id: 2, label: "Cafe" },
+		{ id: 3, label: "School" },
+	];
+
+	const ThemeDropdown = () => {
+		const [isOpen, setOpen] = useState(false);
+		const [items, setItem] = useState(theme);
+		const toggleDropdown = () => setOpen(!isOpen);
+
+		const handleItemClick = (id) => {
+			setSelectedTheme(id)
+			console.log(selectedItem)
+		}
+
+
+		return (
+			<div className='dropdown' style={{ width: '40%' }}>
+				<div className='dropdown-header' onClick={toggleDropdown}>
+					{items.find(item => item.id === selectedTheme).label}
+					<FontAwesomeIcon icon={faChevronRight} className={`icon ${isOpen && "open"}`} />
+				</div>
+				<div className={`dropdown-body ${isOpen && 'open'}`}>
+					{items.map(item => (
+						<div className="dropdown-item" onClick={() => handleItemClick(item.id)} id={item.id} key={item.id}>
+							<span className={`dropdown-item-dot ${item.id === selectedTheme && 'selected'}`}>• </span>
+							{item.label}
+						</div>
+					))}
+				</div>
+			</div>
+		)
+	}
+
 
 	return (
 		<div className="App">
 			<div className="container">
 				<div className="textToSpeechContainer">
 					<div className="avatarContainer">
+						{/* <div className="themeContainer">
+							<h3>Choose Theme: </h3>
+							<ThemeDropdown />
+
+						</div> */}
+						<ThemeDropdown />
+
 						<img className="avatar" id="avatar" src={avatar} alt="avatar" />
 					</div>
 					<div className="buttonsContainer">
