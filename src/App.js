@@ -830,7 +830,22 @@ function App() {
 							<ChatContainer>
 								<ConversationHeader>
 									<Avatar src={logo} name="Akane" />
-									<ConversationHeader.Content userName="Teacher" info="Active Now" />
+									<ConversationHeader.Content
+										userName={
+											selectedTheme === 0
+												? "Friend Kayndis"
+												: selectedTheme === 1
+													? "Barista Jessy"
+													: selectedTheme === 2
+														? "Professor Clerk"
+														: selectedTheme === 3
+															? "Prononciation Checker John"
+
+															: "ChatGPT"
+										}
+										info="Active Now"
+									/>
+
 								</ConversationHeader>
 								<MessageList
 									scrollBehavior="smooth"
