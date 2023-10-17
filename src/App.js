@@ -33,12 +33,46 @@ function App() {
 	const [generatedText, setGeneratedText] = useState("");
 	const [typing, setTyping] = useState(false);
 	const [convertProcess, setConvertProcess] = useState(false);
-	const [messages, setMessages] = useState([
+
+	var [messages, setMessages] = useState([
 		{
-			message: "Hello!",
+			message: "hello",
 			sender: "user",
 		},
 	]);
+
+	useEffect(() => {
+		if (selectedTheme === 0) {
+			setMessages([
+				{
+					message: "Hello! How may I help you today?",
+					sender: "user",
+				},
+			]);
+		} else if (selectedTheme === 1) {
+			setMessages([
+				{
+					message: "Hey there! Welcome to Nakama Cafe. How can I assist you today?",
+					sender: "user",
+				},
+			]);
+		} else if (selectedTheme === 2) {
+			setMessages([
+				{
+					message: "Hello! As a teacher from the University of Tokyo, I'm here to help and provide information. If you have any questions or need assistance with any educational or academic topics, please feel free to ask.",
+					sender: "user",
+				},
+			]);
+		} else if (selectedTheme === 3) {
+			setMessages([
+				{
+					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					sender: "user",
+				},
+			]);
+		}
+	}, [selectedTheme]);
+
 	const handleSend = async (message) => {
 		const newMessage = {
 			message: message,
@@ -210,13 +244,17 @@ function App() {
 				};
 			});
 
-			const durationOptions = [3, 5, 10, 15]; // Available recording duration options
+			const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
 			const [selectedDuration, setSelectedDuration] = useState(3);
 			const [isOpen, setOpen] = useState(false);
 
 			const toggleDropdown = () => setOpen(!isOpen);
 
 			useEffect(() => {
+				const duration = JSON.parse(localStorage.getItem('duration'));
+				if (duration) {
+					setSelectedDuration(duration)
+				}
 				let timer;
 				if (recording && selectedDuration > 0) {
 					timer = setInterval(() => {
@@ -274,6 +312,8 @@ function App() {
 			const handleDurationChange = (duration) => {
 				setSelectedDuration(duration);
 				toggleDropdown(); // Close the dropdown when a duration is selected
+				localStorage.setItem('duration', JSON.stringify(duration));
+
 			};
 
 			return (
@@ -620,13 +660,13 @@ function App() {
 
 		var content = ""
 		if (selectedTheme === 0) {
-			content = "You are an AI"
-		} else if (selectedTheme === 1) {
 			content = "You are free to say anything"
-		} else if (selectedTheme === 2) {
+		} else if (selectedTheme === 1) {
 			content = "I want you to act as a barista from nakama cafe, you will communicate with me as a barista to a client. And don't mention barista for the response"
+		} else if (selectedTheme === 2) {
+			content = "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher"
 		} else if (selectedTheme === 3) {
-			content = "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects"
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their prononciation whether it is correct or not."
 		}
 		const systemMessage = {
 			role: "system",
@@ -726,10 +766,10 @@ function App() {
 	}
 
 	const theme = [
-		{ id: 0, label: "Choose Theme" },
-		{ id: 1, label: "Free Talk" },
-		{ id: 2, label: "Cafe" },
-		{ id: 3, label: "School" },
+		{ id: 0, label: "Free Talk" },
+		{ id: 1, label: "Cafe" },
+		{ id: 2, label: "School" },
+		{ id: 3, label: "Check Prononciation" },
 	];
 
 	const ThemeDropdown = () => {
