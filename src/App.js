@@ -20,7 +20,12 @@ import { Amplify, Predictions } from "aws-amplify";
 import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
 import awsconfig from "./aws-exports";
 import mic from "microphone-stream";
-import avatar from './assets/bg_character_.png';
+
+
+import freetalk from './assets/friend.png';
+import cafe from './assets/barista.png';
+import school from './assets/teacher.png';
+import prononciation from './assets/prononciation.png';
 
 
 Amplify.configure(awsconfig);
@@ -33,7 +38,6 @@ function App() {
 	const [generatedText, setGeneratedText] = useState("");
 	const [typing, setTyping] = useState(false);
 	const [convertProcess, setConvertProcess] = useState(false);
-
 	var [messages, setMessages] = useState([
 		{
 			message: "hello",
@@ -244,17 +248,14 @@ function App() {
 				};
 			});
 
-			const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
 			const [selectedDuration, setSelectedDuration] = useState(3);
+			const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
 			const [isOpen, setOpen] = useState(false);
 
 			const toggleDropdown = () => setOpen(!isOpen);
 
 			useEffect(() => {
-				const duration = JSON.parse(localStorage.getItem('duration'));
-				if (duration) {
-					setSelectedDuration(duration)
-				}
+
 				let timer;
 				if (recording && selectedDuration > 0) {
 					timer = setInterval(() => {
@@ -312,7 +313,6 @@ function App() {
 			const handleDurationChange = (duration) => {
 				setSelectedDuration(duration);
 				toggleDropdown(); // Close the dropdown when a duration is selected
-				localStorage.setItem('duration', JSON.stringify(duration));
 
 			};
 
@@ -814,7 +814,22 @@ function App() {
 						</div> */}
 						<ThemeDropdown />
 
-						<img className="avatar" id="avatar" src={avatar} alt="avatar" />
+						<img
+							className="avatar"
+							id="avatar"
+							src={
+								selectedTheme === 0
+									? freetalk
+									: selectedTheme === 1
+										? cafe
+										: selectedTheme === 2
+											? school
+											: selectedTheme === 3
+												? prononciation
+												: cafe // The default option if none of the themes match
+							}
+							alt="avatar"
+						/>
 					</div>
 					<div className="buttonsContainer">
 						<div className="buttons">
