@@ -32,7 +32,7 @@ Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
 function App() {
-	const [selectedItem, setSelectedItem] = useState(0);
+	const [selectedItem, setSelectedItem] = useState(1);
 	const [selectedTheme, setSelectedTheme] = useState(0);
 	const [textToSpeechEnabled, setTextToSpeechEnabled] = useState(true); // Add state to control the text-to-speech function
 	const [generatedText, setGeneratedText] = useState("");
@@ -44,6 +44,7 @@ function App() {
 			sender: "user",
 		},
 	]);
+
 
 	useEffect(() => {
 		if (selectedTheme === 0) {
@@ -68,6 +69,20 @@ function App() {
 				},
 			]);
 		} else if (selectedTheme === 3) {
+			setMessages([
+				{
+					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					sender: "user",
+				},
+			]);
+		} else if (selectedTheme === 4) {
+			setMessages([
+				{
+					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					sender: "user",
+				},
+			]);
+		}else if (selectedTheme === 5) {
 			setMessages([
 				{
 					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
@@ -248,7 +263,7 @@ function App() {
 				};
 			});
 
-			const [selectedDuration, setSelectedDuration] = useState(3);
+			const [selectedDuration, setSelectedDuration] = useState(5);
 			const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
 			const [isOpen, setOpen] = useState(false);
 
@@ -666,7 +681,11 @@ function App() {
 		} else if (selectedTheme === 2) {
 			content = "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher"
 		} else if (selectedTheme === 3) {
-			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their prononciation whether it is correct or not."
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 45 words. User don't have to repeat the old sentence"
+		} else if (selectedTheme === 4) {
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 50 words. User don't have to repeat the old sentence"
+		} else if (selectedTheme === 5) {
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 100 words. User don't have to repeat the old sentence"
 		}
 		const systemMessage = {
 			role: "system",
@@ -679,7 +698,7 @@ function App() {
 			model: "gpt-3.5-turbo",
 			messages: [systemMessage, ...apiMessages],
 			stream: true,
-			max_tokens: 100,
+			max_tokens: 150,
 		};
 		const res = await fetch("https://api.openai.com/v1/chat/completions", {
 			method: "POST",
@@ -769,38 +788,58 @@ function App() {
 		{ id: 0, label: "Free Talk" },
 		{ id: 1, label: "Cafe" },
 		{ id: 2, label: "School" },
-		{ id: 3, label: "Check Prononciation" },
+		{ id: 3, label: "Third Grade Level" },
+		{ id: 4, label: "Graduate Level" },
+		{ id: 5, label: "News Level" },
 	];
 
-	const ThemeDropdown = () => {
+	const [showLevels, setShowLevels] = useState(false);
+
+	const handleItemClick = (id) => {
+		setSelectedTheme(id);
+		if (id === 3) {
+			setShowLevels(!showLevels);
+		}
+	};
+	const firstThreeItems = theme.slice(0, 3);
+	const remainingItems = theme.slice(3);
+
+
+	const ThemeDropdown = ({ items, selectedTheme, handleItemClick }) => {
 		const [isOpen, setOpen] = useState(false);
-		const [items, setItem] = useState(theme);
+
 		const toggleDropdown = () => setOpen(!isOpen);
 
-		const handleItemClick = (id) => {
-			setSelectedTheme(id)
-			console.log(selectedItem)
-		}
-
-
 		return (
-			<div className='dropdown' style={{ width: '40%' }}>
-				<div className='dropdown-header' onClick={toggleDropdown}>
-					{items.find(item => item.id === selectedTheme).label}
-					<FontAwesomeIcon icon={faChevronRight} className={`icon ${isOpen && "open"}`} />
+			<div className="dropdown">
+				<div className="dropdown-header" onClick={toggleDropdown}>
+					{items.find((item) => item.id === selectedTheme)?.label}
+					<FontAwesomeIcon
+						icon={faChevronRight}
+						className={`icon ${isOpen && "open"}`}
+					/>
 				</div>
-				<div className={`dropdown-body ${isOpen && 'open'}`}>
-					{items.map(item => (
-						<div className="dropdown-item" onClick={() => handleItemClick(item.id)} id={item.id} key={item.id}>
-							<span className={`dropdown-item-dot ${item.id === selectedTheme && 'selected'}`}>• </span>
+				<div className={`dropdown-body ${isOpen && "open"}`}>
+					{items.map((item) => (
+						<div
+							className="dropdown-item"
+							onClick={() => handleItemClick(item.id)}
+							id={item.id}
+							key={item.id}
+						>
+							<span
+								className={`dropdown-item-dot ${item.id === selectedTheme && "selected"
+									}`}
+							>
+								•{" "}
+							</span>
 							{item.label}
 						</div>
 					))}
 				</div>
 			</div>
-		)
-	}
-
+		);
+	};
 
 	return (
 		<div className="App">
@@ -812,8 +851,24 @@ function App() {
 							<ThemeDropdown />
 
 						</div> */}
-						<ThemeDropdown />
-
+						<div className="themeContainer">
+							<div>
+								<p>Theme</p>
+								<ThemeDropdown
+									items={firstThreeItems}
+									selectedTheme={selectedTheme}
+									handleItemClick={handleItemClick}
+								/>
+							</div>
+							<div>
+								<p>Pronunciation</p>
+								<ThemeDropdown
+									items={remainingItems}
+									selectedTheme={selectedTheme}
+									handleItemClick={handleItemClick}
+								/>
+							</div>
+						</div>
 						<img
 							className="avatar"
 							id="avatar"
@@ -854,7 +909,11 @@ function App() {
 													: selectedTheme === 2
 														? "Professor Clerk"
 														: selectedTheme === 3
-															? "Prononciation Checker John"
+															? "Prononciation Checker John (Junior high school third grade level)"
+														: selectedTheme === 4
+															? "Prononciation Checker John (High school graduate level)"
+														: selectedTheme === 5
+															? "Prononciation Checker John (News level)"
 
 															: "ChatGPT"
 										}

@@ -34,7 +34,7 @@ code {
 
 
 .avatar {
-  height: 80vh; 
+  height: 70vh; 
   width: auto;
   margin-bottom: 20px; 
 }
@@ -63,8 +63,11 @@ code {
 
 .themeContainer {
   display: flex;
-  width: 70%;
-  justify-content: space-between;
+  width: 100%;
+  justify-content: space-around;
+}
+.themeContainer > div {
+  width: 40%
 }
 
 
@@ -100,6 +103,7 @@ code {
   padding: 5px;
   border-top: 1px solid #E5E8EC;
   display: none;
+
 }
 
 .dropdown-body.open {
@@ -124,6 +128,7 @@ code {
   opacity: 1;
 }
 
+
 .icon {
   font-size: 13px;
   color: #91A5BE;
@@ -133,6 +138,14 @@ code {
 
 .icon.open {
   transform: rotate(90deg);
+}
+
+.ThemeContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  margin: 10px;
 }
 
 
