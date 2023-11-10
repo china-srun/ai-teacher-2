@@ -38,6 +38,7 @@ function App() {
 	const [generatedText, setGeneratedText] = useState("");
 	const [typing, setTyping] = useState(false);
 	const [convertProcess, setConvertProcess] = useState(false);
+	
 	var [messages, setMessages] = useState([
 		{
 			message: "hello",
@@ -47,6 +48,7 @@ function App() {
 
 
 	useEffect(() => {
+		var content = "";
 		if (selectedTheme === 0) {
 			setMessages([
 				{
@@ -54,6 +56,7 @@ function App() {
 					sender: "user",
 				},
 			]);
+	
 		} else if (selectedTheme === 1) {
 			setMessages([
 				{
@@ -69,28 +72,49 @@ function App() {
 				},
 			]);
 		} else if (selectedTheme === 3) {
+			content = "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.";
 			setMessages([
 				{
-					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					message: content,
 					sender: "user",
 				},
 			]);
+			setGeneratedText(content);
+			content = ""
 		} else if (selectedTheme === 4) {
+			content = "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.";
 			setMessages([
 				{
-					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					message: content,
 					sender: "user",
 				},
 			]);
-		}else if (selectedTheme === 5) {
+			setGeneratedText(content);
+			content = ""
+
+
+		} else if (selectedTheme === 5) {
+			content = "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.";
 			setMessages([
 				{
-					message: "Please read aloud this English sentence. I will check your pronunciation. ‘Today I want to tell you three stories from my life. That’s it. No big deal. Just three stories. The first story is about connecting the dots.’.",
+					message: content,
 					sender: "user",
 				},
 			]);
+			setGeneratedText(content);
+			content = ""
+
 		}
+
 	}, [selectedTheme]);
+	
+
+	// useEffect(() => {
+	// 	if (messages.length > 0) {
+	// 		setGeneratedText(messages[0].message);
+
+	// 	}
+	// }, [messages]);
 
 	const handleSend = async (message) => {
 		const newMessage = {
@@ -681,11 +705,12 @@ function App() {
 		} else if (selectedTheme === 2) {
 			content = "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher"
 		} else if (selectedTheme === 3) {
-			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 45 words. User don't have to repeat the old sentence"
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 45 words. User don't have to repeat the old sentence"
 		} else if (selectedTheme === 4) {
-			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 50 words. User don't have to repeat the old sentence"
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 50 words. User don't have to repeat the old sentence"
 		} else if (selectedTheme === 5) {
-			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to generate another sentence for the user to practice with the length of 100 words. User don't have to repeat the old sentence"
+			content = "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 100 words. User don't have to repeat the old sentence"
+			
 		}
 		const systemMessage = {
 			role: "system",
