@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+import icon from "./assets/icon.png";
 import "./App.css";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
@@ -20,7 +20,7 @@ import {
   Avatar,
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Amplify, Predictions } from "aws-amplify";
 import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
 import awsconfig from "./aws-exports";
@@ -41,11 +41,15 @@ function App() {
   const [generatedText, setGeneratedText] = useState("");
   const [typing, setTyping] = useState(false);
   const [convertProcess, setConvertProcess] = useState(false);
+  let AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const source = audioCtx.createBufferSource();
 
   var [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (selectedTheme === 0) {
+      setGeneratedText("");
       setMessages([
         {
           message:
@@ -54,6 +58,7 @@ function App() {
         },
       ]);
     } else if (selectedTheme === 1) {
+      setGeneratedText("");
       setMessages([
         {
           message:
@@ -62,6 +67,7 @@ function App() {
         },
       ]);
     } else if (selectedTheme === 2) {
+      setGeneratedText("");
       setMessages([
         {
           message:
@@ -70,16 +76,19 @@ function App() {
         },
       ]);
     } else if (selectedTheme === 3) {
+      setGeneratedText("");
       firstSend(
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 45 words. This type of user's english proficiency is third grade level, so generete sentence that fits their level. And continue to improve the generated sentence. don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     } else if (selectedTheme === 4) {
+      setGeneratedText("");
       firstSend(
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 60 words. This type of user's english proficiency is graduate level meaning that the generated sentence is in the middle in terms of difficulty, so please generate sentence that fits their level. And continue to improve the generated sentence. User don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     } else if (selectedTheme === 5) {
+      setGeneratedText("");
       firstSend(
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 75 words. This type of user's english proficiency is news level meaning that the generated sentence is hard compared to other levels, so please generate sentence that fits their level. And continue to improve the generated sentence. User don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     }
   }, [selectedTheme]);
@@ -106,7 +115,6 @@ function App() {
   };
 
   const firstSend = async (message) => {
-
     const systemMessage = {
       role: "system",
       content: message,
@@ -114,7 +122,7 @@ function App() {
 
     const apiRequestBody = {
       model: "gpt-3.5-turbo",
-      messages: [systemMessage, {role: "assistant", content: message}],
+      messages: [systemMessage, { role: "assistant", content: message }],
       max_tokens: 150,
     };
     await fetch("https://api.openai.com/v1/chat/completions", {
@@ -569,11 +577,19 @@ function App() {
   function TextToSpeech({ generatedText }) {
     const [response, setResponse] = useState("...");
 
+
     useEffect(() => {
       if (generatedText && textToSpeechEnabled) {
         // Check if the text-to-speech is enabled before generating
         generateTextToSpeech();
+
+        // if (audioCtx.state === "running") {
+        //   audioCtx.close()
+
+        // }
       }
+
+
     }, [generatedText, textToSpeechEnabled]);
 
     function toggleTextToSpeech() {
@@ -600,23 +616,24 @@ function App() {
         },
       })
         .then((result) => {
+          console.log(result);
           if (!textToSpeechEnabled) {
             return; // Return early if text-to-speech is disabled before the generation completes
           }
-          let AudioContext = window.AudioContext || window.webkitAudioContext;
-          console.log({ AudioContext });
-          const audioCtx = new AudioContext();
-          const source = audioCtx.createBufferSource();
+
           audioCtx.decodeAudioData(
             result.audioStream,
             (buffer) => {
               source.buffer = buffer;
               source.connect(audioCtx.destination);
               // source.playbackRate.value = 5;
-              source.start(0);
+              source.start();
+
             },
             (err) => console.log({ err })
           );
+
+          
 
           setResponse(`Generation completed, press play`);
         })
@@ -736,13 +753,13 @@ function App() {
         "I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher";
     } else if (selectedTheme === 3) {
       content =
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 45 words. This type of user's english proficiency is third grade level, so generete sentence that fits their level. And continue to improve the generated sentence. don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     } else if (selectedTheme === 4) {
       content =
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 60 words. This type of user's english proficiency is graduate level meaning that the generated sentence is in the middle hard in terms of difficulty, so please generate sentence that fits their level. And continue to improve the generated sentence. User don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     } else if (selectedTheme === 5) {
       content =
-        "I want you to act as a prononciation checker, user will put the message using their voice and you check for their pronunciation whether it is correct or not. After correcting them, I want you to fix their mistakes and generate another sentence for the user to practice with the length of 75 words. This type of user's english proficiency is news level meaning that the generated sentence is hard compared to other levels, so please generate sentence that fits their level. And continue to improve the generated sentence. User don't have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     }
     const systemMessage = {
       role: "system",
@@ -964,7 +981,7 @@ function App() {
             <MainContainer>
               <ChatContainer>
                 <ConversationHeader>
-                  <Avatar src={logo} name="Akane" />
+                  <Avatar src={icon} name="Akane" />
                   <ConversationHeader.Content
                     userName={
                       selectedTheme === 0
@@ -997,7 +1014,7 @@ function App() {
                   {messages.map((message, index) => {
                     return (
                       <Message key={index} model={message}>
-                        <Avatar src={logo} name="Joe" size="md" />
+                        <Avatar src={icon} name="Joe" size="md" />
                       </Message>
                     );
                   })}
