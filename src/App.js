@@ -41,9 +41,7 @@ function App() {
   const [generatedText, setGeneratedText] = useState("");
   const [typing, setTyping] = useState(false);
   const [convertProcess, setConvertProcess] = useState(false);
-  let AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = new AudioContext();
-  const source = audioCtx.createBufferSource();
+
 
   var [messages, setMessages] = useState([]);
 
@@ -620,14 +618,16 @@ function App() {
           if (!textToSpeechEnabled) {
             return; // Return early if text-to-speech is disabled before the generation completes
           }
-
+          let AudioContext = window.AudioContext || window.webkitAudioContext;
+          const audioCtx = new AudioContext();
+          const source = audioCtx.createBufferSource();
           audioCtx.decodeAudioData(
             result.audioStream,
             (buffer) => {
               source.buffer = buffer;
               source.connect(audioCtx.destination);
               // source.playbackRate.value = 5;
-              source.start();
+              source.start(0);
 
             },
             (err) => console.log({ err })
@@ -925,6 +925,7 @@ function App() {
 
   return (
     <div className="App">
+
       <div className="container">
         <div className="textToSpeechContainer">
           <div className="avatarContainer">
@@ -934,7 +935,7 @@ function App() {
 
 						</div> */}
             <div className="themeContainer">
-              <div>
+              <div className="">
                 <p>Theme</p>
                 <ThemeDropdown
                   items={firstThreeItems}

@@ -1,3 +1,4 @@
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -170,13 +171,20 @@ code {
 @media (max-width: 1200px) {
   /* On screens with maximum width of 768px (e.g., mobile devices) */
   .avatar {
-    height: 30vh; /* Adjust the height as per your requirement for smaller screens */
+    display: none;
+  }
+
+  .textToSpeechContainer {
+    width: 100%
   }
 }
 
 @media (max-width: 480px) {
   /* On screens with maximum width of 480px (e.g., small mobile devices) */
   .avatar {
-    height: 40vh; /* Adjust the height as per your requirement for even smaller screens */
+    display: none;
+  }
+  .textToSpeechContainer {
+    width: 100%
   }
 }
