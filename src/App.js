@@ -1,5 +1,6 @@
 import icon from "./assets/icon.png";
 import "./App.css";
+import "@fontsource/inter";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   faVolumeUp,
@@ -30,6 +31,9 @@ import freetalk from "./assets/friend.png";
 import cafe from "./assets/barista.png";
 import school from "./assets/teacher.png";
 import prononciation from "./assets/prononciation.png";
+import Button from "./components/button.js";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
 
 Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
@@ -41,7 +45,6 @@ function App() {
   const [generatedText, setGeneratedText] = useState("");
   const [typing, setTyping] = useState(false);
   const [convertProcess, setConvertProcess] = useState(false);
-
 
   var [messages, setMessages] = useState([]);
 
@@ -575,6 +578,14 @@ function App() {
   function TextToSpeech({ generatedText }) {
     const [response, setResponse] = useState("...");
 
+    const [isOpen, setOpen] = useState(false);
+    const [items, setItem] = useState(data);
+    const toggleDropdown = () => setOpen(!isOpen);
+
+    const handleItemClick = (id) => {
+      setSelectedItem(id);
+      console.log(selectedItem);
+    };
 
     useEffect(() => {
       if (generatedText && textToSpeechEnabled) {
@@ -586,8 +597,6 @@ function App() {
 
         // }
       }
-
-
     }, [generatedText, textToSpeechEnabled]);
 
     function toggleTextToSpeech() {
@@ -628,12 +637,9 @@ function App() {
               source.connect(audioCtx.destination);
               // source.playbackRate.value = 5;
               source.start(0);
-
             },
             (err) => console.log({ err })
           );
-
-          
 
           setResponse(`Generation completed, press play`);
         })
@@ -651,21 +657,47 @@ function App() {
       //   </div>
       // </div>
       <div className="TextToSpeech">
-        <div>
-          <button
-            onClick={toggleTextToSpeech}
-            title={
-              textToSpeechEnabled
-                ? "Disable Text-to-Speech"
-                : "Enable Text-to-Speech"
-            }
-          >
-            {textToSpeechEnabled ? (
-              <FontAwesomeIcon icon={faVolumeUp} />
-            ) : (
-              <FontAwesomeIcon icon={faVolumeMute} />
-            )}
-          </button>
+        <button
+          onClick={toggleTextToSpeech}
+          title={
+            textToSpeechEnabled
+              ? "Disable Text-to-Speech"
+              : "Enable Text-to-Speech"
+          }
+        >
+          {textToSpeechEnabled ? (
+            <FontAwesomeIcon icon={faVolumeUp} />
+          ) : (
+            <FontAwesomeIcon icon={faVolumeMute} />
+          )}
+        </button>
+        <div className="dropdown" >
+          <div className="dropdown-header" onClick={toggleDropdown}>
+            {items.find((item) => item.id === selectedItem).label}
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              className={`icon ${isOpen && "open"}`}
+            />
+          </div>
+          <div className={`dropdown-body ${isOpen && "open"}`}>
+            {items.map((item) => (
+              <div
+                className="dropdown-item"
+                onClick={() => handleItemClick(item.id)}
+                id={item.id}
+                key={item.id}
+              >
+                <span
+                  className={`dropdown-item-dot ${
+                    item.id === selectedItem && "selected"
+                  }`}
+                >
+                  •{" "}
+                </span>
+                {item.label}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -878,8 +910,14 @@ function App() {
   const [showLevels, setShowLevels] = useState(false);
 
   const handleItemClick = (id) => {
-    setSelectedTheme(id);
+    setSelectedTheme(parseInt(id));
     if (id === 3) {
+      setShowLevels(!showLevels);
+    }
+  };
+  const handleChange = (event, newValue) => {
+    setSelectedTheme(parseInt(newValue));
+    if (parseInt(newValue) === 3) {
       setShowLevels(!showLevels);
     }
   };
@@ -925,7 +963,6 @@ function App() {
 
   return (
     <div className="App">
-
       <div className="container">
         <div className="textToSpeechContainer">
           <div className="avatarContainer">
@@ -934,6 +971,24 @@ function App() {
 							<ThemeDropdown />
 
 						</div> */}
+
+            {/* <Select
+              defaultValue="0"
+              onChange={handleChange}
+              placeholder="Select a Theme"
+            >
+              <Option value="0">Free Talk</Option>
+              <Option value="1">Cafe</Option>
+              <Option value="2">School</Option>
+            </Select>
+            <Select
+              onChange={handleChange}
+              placeholder="Select a Pronunciation"
+            >
+              <Option value="3">Third Grade Level</Option>
+              <Option value="4">Graduate Level</Option>
+              <Option value="5">News Level</Option>
+            </Select> */}
             <div className="themeContainer">
               <div className="">
                 <p>Theme</p>
@@ -943,6 +998,7 @@ function App() {
                   handleItemClick={handleItemClick}
                 />
               </div>
+
               <div>
                 <p>Pronunciation</p>
                 <ThemeDropdown
@@ -973,7 +1029,7 @@ function App() {
             <div className="buttons">
               <SpeechToText />
               <TextToSpeech generatedText={generatedText} />
-              <LanguageDropdown />
+              {/* <LanguageDropdown /> */}
             </div>
           </div>
         </div>
