@@ -36,6 +36,8 @@ code {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  z-index: 1; /* or any high value */
+
 }
 
 
@@ -43,11 +45,16 @@ code {
   height: 60vh; 
   width: auto;
   margin-bottom: 20px; 
+  position: absolute;
+  z-index: 0; /* or any high value */
+  margin-top: 20vh;
+
 }
 
 .avatarContainer {
+  position: relative;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
 }
 
@@ -56,8 +63,13 @@ code {
 .buttonsContainer button {
   margin: 5px;
   margin-top: 10px; 
+  z-index: 1; /* or any high value */
+
 }
 
+.buttonsContainer {
+  margin-top: 1vh;;
+}
 
 
 .buttons {
@@ -70,6 +82,8 @@ code {
   display: flex;
   width: 100%;
   justify-content: space-around;
+  z-index: 1; /* or any high value */
+
 }
 .themeContainer > div {
   width: 40%
@@ -94,6 +108,8 @@ code {
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0,0,0,.1);
   background-color: white;
+  z-index: 2; /* or any high value */
+
 }
 
 .dropdown-header {
@@ -102,6 +118,8 @@ code {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 2; /* or any high value */
+
 }
 
 .dropdown-body {
@@ -153,6 +171,8 @@ code {
   width: 100%;
   justify-content: center;
   margin: 10px;
+  z-index: 1; /* or any high value */
+
 }
 
 
