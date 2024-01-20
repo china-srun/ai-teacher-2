@@ -79,17 +79,17 @@ function App() {
     } else if (selectedTheme === 3) {
       setGeneratedText("");
       firstSend(
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     } else if (selectedTheme === 4) {
       setGeneratedText("");
       firstSend(
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 90 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     } else if (selectedTheme === 5) {
       setGeneratedText("");
       firstSend(
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "I want you to act as a pronunciation checker. The user is an English learner of an professional level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 180 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
       );
     }
   }, [selectedTheme]);
@@ -310,8 +310,14 @@ function App() {
           },
         };
       });
-      
-      const [selectedDuration, setSelectedDuration] = useState(5);
+
+      const [selectedDuration, setSelectedDuration] = useState(() => {
+        const storedDuration = localStorage.getItem("originalSelectedDuration");
+        return storedDuration ? parseInt(storedDuration, 10) : 5; // Default value if not found
+      });
+
+      const [countdown, setCountdown] = useState(() => selectedDuration);
+
       const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
       const [isOpen, setOpen] = useState(false);
 
@@ -319,24 +325,23 @@ function App() {
 
       useEffect(() => {
         let timer;
-        if (recording && selectedDuration > 0) {
+        if (recording && countdown > 0) {
           timer = setInterval(() => {
-            setSelectedDuration((prevDuration) => prevDuration - 1);
+            setCountdown((prevCountdown) => prevCountdown - 1);
           }, 1000);
-        } else if (selectedDuration === 0) {
+        } else if (countdown === 0) {
           stopRecording();
-          setSelectedDuration(0); // Reset the timer to 0 when it reaches zero
+          setCountdown(0);
         }
-
+    
         return () => clearInterval(timer);
-      }, [recording, selectedDuration]);
-
-      
+      }, [recording, countdown]);
+    
 
       const startRecording = async () => {
         console.log("start recording");
         audioBuffer.reset();
-        setSelectedDuration(selectedDuration); // Use the selected duration
+        setCountdown(selectedDuration); // Reset the countdown to the original selected duration
         try {
           const stream = await window.navigator.mediaDevices.getUserMedia({
             video: false,
@@ -375,11 +380,15 @@ function App() {
         if (typeof finishRecording === "function") {
           finishRecording(resultBuffer);
         }
+        localStorage.setItem('originalSelectedDuration', selectedDuration);
+
       };
 
       const handleDurationChange = (duration) => {
         setSelectedDuration(duration);
         toggleDropdown(); // Close the dropdown when a duration is selected
+        setCountdown(duration); // Reset the countdown when the duration changes
+
       };
 
       return (
@@ -389,7 +398,7 @@ function App() {
               <button onClick={stopRecording} title="Stop Recording">
                 <FontAwesomeIcon icon={faSpinner} spin />
               </button>
-              <div>Time Left: {selectedDuration} seconds</div>
+              <div>Time Left: {countdown} seconds</div>
             </>
           ) : (
             <>
@@ -673,7 +682,7 @@ function App() {
             <FontAwesomeIcon icon={faVolumeMute} />
           )}
         </button>
-        <div className="dropdown" >
+        <div className="dropdown">
           <div className="dropdown-header" onClick={toggleDropdown}>
             {items.find((item) => item.id === selectedItem).label}
             <FontAwesomeIcon
@@ -787,13 +796,13 @@ function App() {
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher";
     } else if (selectedTheme === 3) {
       content =
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     } else if (selectedTheme === 4) {
       content =
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 90 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     } else if (selectedTheme === 5) {
       content =
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
+        "I want you to act as a pronunciation checker. The user is an English learner of an professional level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 180 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
     }
     const systemMessage = {
       role: "system",
