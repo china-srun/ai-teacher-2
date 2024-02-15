@@ -79,18 +79,16 @@ function App() {
     } else if (selectedTheme === 3) {
       setGeneratedText("");
       firstSend(
-        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
+        "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"
       );
     } else if (selectedTheme === 4) {
       setGeneratedText("");
       firstSend(
-        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 90 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
-      );
+        "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"      );
     } else if (selectedTheme === 5) {
       setGeneratedText("");
       firstSend(
-        "I want you to act as a pronunciation checker. The user is an English learner of an professional level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 180 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response."
-      );
+        "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"      );
     }
   }, [selectedTheme]);
 
@@ -796,14 +794,13 @@ function App() {
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher";
     } else if (selectedTheme === 3) {
       content =
-        "I want you to act as a pronunciation checker. The user is an English learner of an elementary level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 45 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
-    } else if (selectedTheme === 4) {
+      "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    } 
+      else if (selectedTheme === 4) {
       content =
-        "I want you to act as a pronunciation checker. The user is an English learner of an pre-intermediate level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 90 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
-    } else if (selectedTheme === 5) {
+      "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    } 
+      else if (selectedTheme === 5) {
       content =
-        "I want you to act as a pronunciation checker. The user is an English learner of an professional level. The user will put the message using their voice and you check for their pronunciation,  point out their mistakes and give some advice. After that, generate another sentence for the user to practice with the length of 180 words and continue to improve the generated sentence. Don’t have to repeat the old sentence. However, first of all, please generate a sample sentence for the user to practice and put it at the beginning of the response.";
-    }
+      "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    }
     const systemMessage = {
       role: "system",
       content: content,
