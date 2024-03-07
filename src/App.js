@@ -49,7 +49,7 @@ function App() {
   var [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    if (selectedTheme === 0) {
+    if (selectedTheme === 0 && selectedItem === 1) {
       setGeneratedText("");
       setMessages([
         {
@@ -58,7 +58,7 @@ function App() {
           sender: "user",
         },
       ]);
-    } else if (selectedTheme === 1) {
+    } else if (selectedTheme === 1 && selectedItem === 1) {
       setGeneratedText("");
       setMessages([
         {
@@ -67,7 +67,7 @@ function App() {
           sender: "user",
         },
       ]);
-    } else if (selectedTheme === 2) {
+    } else if (selectedTheme === 2 && selectedItem === 1) {
       setGeneratedText("");
       setMessages([
         {
@@ -76,21 +76,68 @@ function App() {
           sender: "user",
         },
       ]);
-    } else if (selectedTheme === 3) {
+    } else if (selectedTheme === 3 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
         "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"
       );
-    } else if (selectedTheme === 4) {
+    } else if (selectedTheme === 4 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
-        "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"      );
-    } else if (selectedTheme === 5) {
+        "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"
+      );
+    } else if (selectedTheme === 5 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
-        "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"      );
+        "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"
+      );
     }
-  }, [selectedTheme]);
+
+    if (selectedItem === 0 && selectedTheme === 0) {
+      setGeneratedText("");
+      setMessages([
+        {
+          message: "こんにちは。何か相談したいことはありますか?",
+          sender: "user",
+        },
+      ]);
+      // setSelectedTheme(0);
+    } else if (selectedItem === 0 && selectedTheme === 1) {
+      setGeneratedText("");
+      setMessages([
+        {
+          message:
+            "ちょっと、そこ！なかまカフェへようこそ。今日はどのようにお手伝いできますか?",
+          sender: "user",
+        },
+      ]);
+      // setSelectedTheme(0);
+    } else if (selectedItem === 0 && selectedTheme === 2) {
+      setGeneratedText("");
+      setMessages([
+        {
+          message:
+            "「こんにちは！ 東京大学の教師として、私は情報を提供し、お手伝いするためにここにいます。教育上または学術上のトピックについてご質問やサポートが必要な場合は、お気軽にお問い合わせください。」,",
+          sender: "user",
+        },
+      ]);
+    } else if (selectedItem === 0 && selectedTheme === 3) {
+      setGeneratedText("");
+      firstSend(
+        "ユーザーがスピーキングを練習できるように、日本語の文章 (少なくとも 10 単語) を生成してください。ユーザーが声を入力したら、アドバイスを与えてから、別のアドバイスを生成してください。ユーザーの発音が正しいかどうかをチェックします。必ず日本語でのみ応答してください"
+      );
+    } else if (selectedItem === 0 && selectedTheme === 4) {
+      setGeneratedText("");
+      firstSend(
+        "「ユーザーがスピーキングの練習をするために、日本語の文（少なくとも 30 単語）を生成してください。単語のレベルは発音が少し難しいようにしてください。ユーザーが音声を入力した後、アドバイスを与えてから、別の文を生成してください。チェックを入れます。」ユーザーの発音が正しいかどうか。」"
+      );
+    } else if (selectedItem === 0 && selectedTheme === 5) {
+      setGeneratedText("");
+      firstSend(
+        "「ユーザーのスピーキング練習に役立つ日本語の文 (50 語以上) を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」"
+      );
+    }
+  }, [selectedTheme, selectedItem]);
 
   // useEffect(() => {
   // 	if (messages.length > 0) {
@@ -331,10 +378,9 @@ function App() {
           stopRecording();
           setCountdown(0);
         }
-    
+
         return () => clearInterval(timer);
       }, [recording, countdown]);
-    
 
       const startRecording = async () => {
         console.log("start recording");
@@ -378,15 +424,13 @@ function App() {
         if (typeof finishRecording === "function") {
           finishRecording(resultBuffer);
         }
-        localStorage.setItem('originalSelectedDuration', selectedDuration);
-
+        localStorage.setItem("originalSelectedDuration", selectedDuration);
       };
 
       const handleDurationChange = (duration) => {
         setSelectedDuration(duration);
         toggleDropdown(); // Close the dropdown when a duration is selected
         setCountdown(duration); // Reset the countdown when the duration changes
-
       };
 
       return (
@@ -784,23 +828,39 @@ function App() {
     // role: "system" => how we define chatGPT to talk
 
     var content = "";
-    if (selectedTheme === 0) {
+    if (selectedItem === 0 && selectedTheme === 0) {
       content = "You are free to say anything";
-    } else if (selectedTheme === 1) {
+    } else if (selectedItem === 1 && selectedTheme === 1) {
       content =
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a barista from nakama cafe, you will communicate with me as a barista to a client. And don't mention barista for the response";
-    } else if (selectedTheme === 2) {
+    } else if (selectedItem === 1 && selectedTheme === 2) {
       content =
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher";
-    } else if (selectedTheme === 3) {
+    } else if (selectedItem === 1 && selectedTheme === 3) {
       content =
-      "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    } 
-      else if (selectedTheme === 4) {
+        "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct";
+    } else if (selectedItem === 1 && selectedTheme === 4) {
       content =
-      "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    } 
-      else if (selectedTheme === 5) {
+        "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct";
+    } else if (selectedItem === 1 && selectedTheme === 5) {
       content =
-      "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct"    }
+        "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct";
+    } else if (selectedItem === 0 && selectedTheme === 1) {
+      content =
+        "開始する前に、応答の単語数を 50 単語未満に制限することを忘れないでください。ナカマカフェのバリスタとして、お客様とバリスタとしてコミュニケーションをとっていただきます。そして、応答のためにバリスタについて言及しないでください";
+    } else if (selectedItem === 0 && selectedTheme === 2) {
+      content =
+        "開始する前に、応答の単語数を 50 単語未満に制限することを忘れないでください。ナカマカフェのバリスタとして、お客様とバリスタとしてコミュニケーションをとっていただきます。そして、応答のためにバリスタについて言及しないでください";
+    } else if (selectedItem === 0 && selectedTheme === 3) {
+      content =
+        "ユーザーがスピーキングを練習できるように、日本語の文章 (少なくとも 10 単語) を生成してください。ユーザーが声を入力したら、アドバイスを与えてから、別のアドバイスを生成してください。ユーザーの発音が正しいかどうかをチェックします。必ず日本語でのみ応答してください";
+    } else if (selectedItem === 0 && selectedTheme === 4) {
+      content =
+        "「ユーザーがスピーキングの練習をするために、日本語の文（少なくとも 30 単語）を生成してください。単語のレベルは発音が少し難しいようにしてください。ユーザーが音声を入力した後、アドバイスを与えてから、別の文を生成してください。チェックを入れます。」ユーザーの発音が正しいかどうか。」";
+    } else if (selectedItem === 0 && selectedTheme === 5) {
+      content =
+        "「ユーザーのスピーキング練習に役立つ日本語の文 (50 語以上) を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」";
+    }
     const systemMessage = {
       role: "system",
       content: content,
@@ -812,7 +872,7 @@ function App() {
       model: "gpt-3.5-turbo",
       messages: [systemMessage, ...apiMessages],
       stream: true,
-      max_tokens: 150,
+      max_tokens: 200,
     };
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
