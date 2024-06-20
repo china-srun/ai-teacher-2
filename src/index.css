@@ -1,0 +1,225 @@
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.TextToSpeech { 
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+.TextToSpeech button,
+.audioRecorder button {
+  font-size: 18px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(102, 100, 100);
+  color: #fff;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  z-index: 1; /* or any high value */
+
+}
+
+
+/* .avatar {
+  height: 60vh; 
+  width: auto;
+  margin-bottom: 20px; 
+  position: absolute;
+  z-index: 0; 
+  margin-top: 20vh;
+} */
+
+.avatar {
+  height: 80vh; 
+  width: auto;
+  margin-bottom: 20px; 
+  position: absolute;
+  z-index: 0; /* or any high value */
+  margin-top: 20vh;
+
+}
+
+.avatarContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+
+.buttonsContainer button {
+  margin: 5px;
+  margin-top: 10px; 
+  z-index: 1; /* or any high value */
+
+}
+
+.buttonsContainer {
+  margin-top: 1vh;;
+}
+
+
+.buttons {
+  display: flex;
+  flex-direction: row; 
+  justify-content: space-around;
+}
+
+.themeContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  z-index: 1; /* or any high value */
+
+}
+.themeContainer > div {
+  width: 40%
+}
+
+
+
+.chatContainer {
+  width: 100%;
+  height: 100%;
+}
+
+
+.audioRecorder {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+.dropdown {
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+  background-color: white;
+  z-index: 2; /* or any high value */
+
+}
+
+.dropdown-header {
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2; /* or any high value */
+
+}
+
+.dropdown-body {
+  padding: 5px;
+  border-top: 1px solid #E5E8EC;
+  display: none;
+
+}
+
+.dropdown-body.open {
+  display: block;
+
+}
+
+.dropdown-item {
+  padding: 10px;
+}
+
+.dropdown-item:hover {
+  cursor: pointer;
+}
+
+.dropdown-item-dot {
+  opacity: 0;
+  color: #91A5BE;
+  transition: all .2s ease-in-out;
+}
+
+.dropdown-item-dot.selected {
+  opacity: 1;
+}
+
+
+.icon {
+  font-size: 13px;
+  color: #91A5BE;
+  transform: rotate(0deg);
+  transition: all .2s ease-in-out;
+  padding-left: 10px;
+}
+
+.icon.open {
+  transform: rotate(90deg);
+}
+
+.ThemeContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  margin: 10px;
+  z-index: 1; /* or any high value */
+
+}
+
+
+/* Media query for responsiveness */
+@media (min-width: 1200px) {
+  /* On screens with minimum width of 768px (e.g., tablets and larger screens) */
+  .container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .textToSpeechContainer {
+    margin-right: 20px;
+    width: 30%;
+  }
+
+  .chatContainer {
+    width: 70%;
+  }
+}
+
+@media (max-width: 1200px) {
+  /* On screens with maximum width of 768px (e.g., mobile devices) */
+  .avatar {
+    display: none;
+  }
+
+  .textToSpeechContainer {
+    width: 100%
+  }
+}
+
+@media (max-width: 480px) {
+  /* On screens with maximum width of 480px (e.g., small mobile devices) */
+  .avatar {
+    display: none;
+  }
+  .textToSpeechContainer {
+    width: 100%
+  }
+}
