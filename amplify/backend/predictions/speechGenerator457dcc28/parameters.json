@@ -1,13 +1,14 @@
 {
-    "resourceName": "transcriptione664065f",
-    "convertPolicyName": "transcriptionPolicye664065f",
+    "resourceName": "speechGenerator457dcc28",
+    "convertPolicyName": "speechGeneratorPolicy457dcc28",
     "authRoleName": {
         "Ref": "AuthRoleName"
     },
     "unauthRoleName": {
         "Ref": "UnauthRoleName"
     },
-    "convertType": "transcription",
+    "convertType": "speechGenerator",
     "language": "en-US",
+    "voice": "Salli",
     "access": "authAndGuest"
 }

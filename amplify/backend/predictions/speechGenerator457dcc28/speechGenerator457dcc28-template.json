@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.0.3\",\"stackType\":\"predictions-Polly\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.8.2\",\"stackType\":\"predictions-Polly\",\"metadata\":{}}",
   "Parameters": {
     "authRoleName": {
       "Type": "String"
@@ -145,6 +145,9 @@
       },
       "ap-northeast-2": {
         "speechGenerator": "ap-northeast-2"
+      },
+      "ap-northeast-3": {
+        "speechGenerator": "ap-northeast-3"
       },
       "ap-southeast-1": {
         "speechGenerator": "ap-southeast-1"

@@ -1,4 +1,3 @@
-import icon from "./assets/icon.png";
 import "./App.css";
 import "@fontsource/inter";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
@@ -18,7 +17,6 @@ import {
   Message,
   MessageInput,
   TypingIndicator,
-  Avatar,
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
 import React, { useState, useEffect, useRef } from "react";
@@ -27,13 +25,6 @@ import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
 import awsconfig from "./aws-exports";
 import mic from "microphone-stream";
 
-import freetalk from "./assets/friend.png";
-import cafe from "./assets/barista.png";
-import school from "./assets/teacher.png";
-import prononciation from "./assets/prononciation.png";
-import Button from "./components/button.js";
-import Select from "@mui/joy/Select";
-import Option from "@mui/joy/Option";
 import { CSVLink, CSVDownload } from "react-csv";
 import * as PIXI from "pixi.js";
 import { Live2DModel } from "pixi-live2d-display/dist/cubism4.js";
@@ -64,12 +55,14 @@ function App() {
       resizeTo: window,
       transparent: true,
       backgroundAlpha: 0,
-
     });
 
-    Live2DModel.from("https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json", {
-      autoInteract: false,
-    }).then((model) => {
+    Live2DModel.from(
+      "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json",
+      {
+        autoInteract: false,
+      }
+    ).then((model) => {
       setSelectedModel(model);
       model.anchor.set(0.5, 0.52);
       model.position.set(window.innerWidth / 2, window.innerHeight / 2);
@@ -83,7 +76,6 @@ function App() {
       });
 
       app.stage.addChild(model);
-
     });
     if (selectedTheme === 0 && selectedItem === 1) {
       setGeneratedText("");
@@ -692,61 +684,70 @@ function App() {
       setTextToSpeechEnabled((prevState) => !prevState); // Toggle the state to enable or disable text-to-speech
     }
 
-    function generateTextToSpeech() {
+    async function generateTextToSpeech() {
       setResponse("Generating audio...");
-      Predictions.convert({
-        textToSpeech: {
-          source: {
-            text: generatedText,
-          },
-          voiceId: "Amy",
-          voiceId: (() => {
-            if (selectedItem === 0) {
-              return "Mizuki";
-            } else if (selectedItem === 1) {
-              return "Amy";
-            }
-          })(),
-          // default configured on aws-exports.js
-          // list of different options are here https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
-        },
-        
-      })
-        .then((result) => {
-          if (!textToSpeechEnabled) {
-            return; // Return early if text-to-speech is disabled before the generation completes
-          }
-          let AudioContext = window.AudioContext || window.webkitAudioContext;
-          const audioCtx = new AudioContext();
-          const source = audioCtx.createBufferSource();
-
-          audioCtx.decodeAudioData(
-            result.audioStream,
-            (buffer) => {
-              startMouthAnimation()
-              source.buffer = buffer;
-              source.connect(audioCtx.destination);
-              // source.playbackRate.value = 5;
-              console.log("audio started here")
-              source.start(0);
-              source.addEventListener('ended', () => {
-                stopMouthAnimation();
-              })
-            },
-            (err) => {
-              console.log(err);
-              stopMouthAnimation();
-            }
-          );
-
-          setResponse(`Generation completed, press play`);
-          stopMouthAnimation();
-        })
-        .catch((err) => {
-          setResponse(err);
-          stopMouthAnimation();
+      const url = "https://api.openai.com/v1/audio/speech";
+      const headers = {
+        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+        'Content-Type': 'application/json'
+      };
+    
+      const data = {
+        model: "tts-1",
+        input: generatedText,
+        voice: "nova",
+      };
+    
+      try {
+        // Make a POST request to the OpenAI audio API
+        const response = await fetch(url, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(data),
         });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const arrayBuffer = await response.arrayBuffer();
+    
+        // Convert the response to the desired audio format and play it
+        if (!textToSpeechEnabled) {
+          return; // Return early if text-to-speech is disabled before the generation completes
+        }
+    
+        let AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createBufferSource();
+    
+        audioCtx.decodeAudioData(
+          arrayBuffer,
+          (buffer) => {
+            startMouthAnimation();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            console.log("audio started here");
+            source.start(0);
+            source.addEventListener("ended", () => {
+              stopMouthAnimation();
+            });
+          },
+          (err) => {
+            console.log(err);
+            stopMouthAnimation();
+          }
+        );
+    
+        setResponse(`Generation completed, press play`);
+      } catch (error) {
+        // Handle errors from the API or the audio processing
+        console.error(`Error: ${error.message}`);
+      } finally {
+        stopMouthAnimation();
+      }
     }
+    
 
     return (
       // <div className="TextToSpeech">
@@ -980,7 +981,6 @@ function App() {
 
     const handleItemClick = (id) => {
       setSelectedItem(id);
-      console.log(selectedItem);
     };
 
     return (
