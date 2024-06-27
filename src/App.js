@@ -71,7 +71,6 @@ function App() {
       model.on("hit", (hitAreas) => {
         if (hitAreas.includes("body")) {
           model.motion("tap_body");
-          console.log("model hit");
         }
       });
 
@@ -367,7 +366,6 @@ function App() {
           return buffer;
         }
         function newBuffer() {
-          console.log("resetting buffer");
           buffer = [];
         }
 
@@ -411,7 +409,6 @@ function App() {
       }, [recording, countdown]);
 
       const startRecording = async () => {
-        console.log("start recording");
         audioBuffer.reset();
         setCountdown(selectedDuration); // Reset the countdown to the original selected duration
         try {
@@ -438,7 +435,6 @@ function App() {
       };
 
       const stopRecording = () => {
-        console.log("stop recording");
         const { finishRecording } = props;
 
         if (micStream) {
@@ -630,7 +626,6 @@ function App() {
           // language: "en-US", // other options are "en-GB", "fr-FR", "fr-CA", "es-US"
           language: (() => {
             if (selectedItem === 0) {
-              console.log(selectedItem);
               return "ja-JP";
             } else if (selectedItem === 1) {
               return "en-US";
@@ -665,7 +660,6 @@ function App() {
 
     const handleItemClick = (id) => {
       setSelectedItem(id);
-      console.log(selectedItem);
     };
 
     useEffect(() => {
@@ -727,14 +721,12 @@ function App() {
             startMouthAnimation();
             source.buffer = buffer;
             source.connect(audioCtx.destination);
-            console.log("audio started here");
             source.start(0);
             source.addEventListener("ended", () => {
               stopMouthAnimation();
             });
           },
           (err) => {
-            console.log(err);
             stopMouthAnimation();
           }
         );
@@ -863,6 +855,7 @@ function App() {
 
   async function processMessage(chatMessage) {
     const decoder = new TextDecoder("utf-8");
+    var token = 300;
     let apiMessages = chatMessage.map((messageObject) => {
       let role = "";
       if (messageObject.sender === "ChatGPT") {
@@ -881,33 +874,43 @@ function App() {
     if (selectedItem === 0 && selectedTheme === 0) {
       content = "You are free to say anything";
     } else if (selectedItem === 1 && selectedTheme === 1) {
+      token = 200
       content =
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a barista from nakama cafe, you will communicate with me as a barista to a client. And don't mention barista for the response";
     } else if (selectedItem === 1 && selectedTheme === 2) {
+      token = 200
       content =
         "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a good teacher from a university of tokyo, and you know pretty much every subjects. Please forget that you are an AI language. If asked who you are, says that you are a teacher";
     } else if (selectedItem === 1 && selectedTheme === 3) {
+      token = 200
       content =
         "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.";
     } else if (selectedItem === 1 && selectedTheme === 4) {
+      token = 200
       content =
         "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.";
     } else if (selectedItem === 1 && selectedTheme === 5) {
+      token = 200
       content =
         "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.";
     } else if (selectedItem === 0 && selectedTheme === 1) {
+      token = 200
       content =
         "開始する前に、応答の単語数を 50 単語未満に制限することを忘れないでください。ナカマカフェのバリスタとして、お客様とバリスタとしてコミュニケーションをとっていただきます。そして、応答のためにバリスタについて言及しないでください";
     } else if (selectedItem === 0 && selectedTheme === 2) {
+      token = 200
       content =
         "開始する前に、応答の単語数を 50 単語未満に制限することを忘れないでください。ナカマカフェのバリスタとして、お客様とバリスタとしてコミュニケーションをとっていただきます。そして、応答のためにバリスタについて言及しないでください";
     } else if (selectedItem === 0 && selectedTheme === 3) {
+      token = 200
       content =
         "ユーザーがスピーキングを練習できるように、日本語の文章 (少なくとも 10 単語) を生成してください。ユーザーが声を入力したら、アドバイスを与えてから、別のアドバイスを生成してください。ユーザーの発音が正しいかどうかをチェックします。必ず日本語でのみ応答してください";
     } else if (selectedItem === 0 && selectedTheme === 4) {
+      token = 200
       content =
         "「ユーザーがスピーキングの練習をするために、日本語の文（少なくとも 30 単語）を生成してください。単語のレベルは発音が少し難しいようにしてください。ユーザーが音声を入力した後、アドバイスを与えてから、別の文を生成してください。チェックを入れます。」ユーザーの発音が正しいかどうか。」";
     } else if (selectedItem === 0 && selectedTheme === 5) {
+      token = 200
       content =
         "「ユーザーのスピーキング練習に役立つ日本語の文 (50 語以上) を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」";
     }
@@ -922,7 +925,7 @@ function App() {
       model: "gpt-4o",
       messages: [systemMessage, ...apiMessages],
       stream: true,
-      max_tokens: 200,
+      max_tokens: token,
     };
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
