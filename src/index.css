@@ -20,6 +20,7 @@ code {
 }
 
 
+
 .TextToSpeech button,
 .audioRecorder button {
   font-size: 18px;
@@ -29,6 +30,10 @@ code {
   background-color: rgb(102, 100, 100);
   color: #fff;
   cursor: pointer;
+}
+
+.audioRecorder {
+  margin-left: 25px;
 }
 
 .container {

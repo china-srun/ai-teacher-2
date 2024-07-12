@@ -227,135 +227,138 @@ function App() {
     // return res.choices[0].text
   };
 
-  // function SpeechToText(props) {
-  // 	const [response, setResponse] = useState();
+  // This use AWS Transcribe, but doesn't include the duration selector
+  function SpeechToText(props) {
+    const [response, setResponse] = useState();
 
-  // 	function AudioRecorder(props) {
-  // 		const [recording, setRecording] = useState(false);
-  // 		const [micStream, setMicStream] = useState();
-  // 		const [audioBuffer] = useState(
-  // 			(function () {
-  // 				let buffer = [];
-  // 				function add(raw) {
-  // 					buffer = buffer.concat(...raw);
-  // 					return buffer;
-  // 				}
-  // 				function newBuffer() {
-  // 					console.log("resetting buffer");
-  // 					buffer = [];
-  // 				}
+    function AudioRecorder(props) {
+      const [recording, setRecording] = useState(false);
+      const [micStream, setMicStream] = useState();
+      const [audioBuffer] = useState(
+        (function () {
+          let buffer = [];
+          function add(raw) {
+            buffer = buffer.concat(...raw);
+            return buffer;
+          }
+          function newBuffer() {
+            console.log("resetting buffer");
+            buffer = [];
+          }
 
-  // 				return {
-  // 					reset: function () {
-  // 						newBuffer();
-  // 					},
-  // 					addData: function (raw) {
-  // 						return add(raw);
-  // 					},
-  // 					getData: function () {
-  // 						return buffer;
-  // 					},
-  // 				};
-  // 			})()
-  // 		);
+          return {
+            reset: function () {
+              newBuffer();
+            },
+            addData: function (raw) {
+              return add(raw);
+            },
+            getData: function () {
+              return buffer;
+            },
+          };
+        })()
+      );
 
-  // 		async function startRecording() {
-  // 			console.log("start recording");
-  // 			audioBuffer.reset();
-  // 			window.navigator.mediaDevices
-  // 				.getUserMedia({ video: false, audio: true })
-  // 				.then((stream) => {
-  // 					const startMic = new mic();
+      async function startRecording() {
+        console.log("start recording");
+        audioBuffer.reset();
+        window.navigator.mediaDevices
+          .getUserMedia({ video: false, audio: true })
+          .then((stream) => {
+            const startMic = new mic();
 
-  // 					startMic.setStream(stream);
-  // 					startMic.on("data", (chunk) => {
-  // 						var raw = mic.toRaw(chunk);
-  // 						if (raw == null) {
-  // 							return;
-  // 						}
-  // 						audioBuffer.addData(raw);
-  // 					});
+            startMic.setStream(stream);
+            startMic.on("data", (chunk) => {
+              var raw = mic.toRaw(chunk);
+              if (raw == null) {
+                return;
+              }
+              audioBuffer.addData(raw);
+            });
 
-  // 					setRecording(true);
-  // 					setMicStream(startMic);
+            setRecording(true);
+            setMicStream(startMic);
+          });
+      }
 
-  // 				});
-  // 		}
+      async function stopRecording() {
+        console.log("stop recording");
+        const { finishRecording } = props;
 
-  // 		async function stopRecording() {
-  // 			console.log("stop recording");
-  // 			const { finishRecording } = props;
+        micStream.stop();
+        setMicStream(null);
+        setRecording(false);
 
-  // 			micStream.stop();
-  // 			setMicStream(null);
-  // 			setRecording(false);
+        const resultBuffer = audioBuffer.getData();
 
-  // 			const resultBuffer = audioBuffer.getData();
+        if (typeof finishRecording === "function") {
+          finishRecording(resultBuffer);
+        }
+      }
 
-  // 			if (typeof finishRecording === "function") {
-  // 				finishRecording(resultBuffer);
-  // 			}
-  // 		}
+      return (
+        <div className="audioRecorder">
+          <div className="audioButton">
+            {recording ? (
+              <button onClick={stopRecording} title="Stop Recording">
+                <FontAwesomeIcon icon={faSpinner} spin />{" "}
+                {/* Show the spinning icon while processing */}
+              </button>
+            ) : (
+              <button onClick={startRecording} title="Start Recording">
+                <FontAwesomeIcon icon={faMicrophone} />{" "}
+                {/* Show the microphone icon when not recording */}
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
 
-  // 		return (
-  // 			<div className="audioRecorder">
-  // 				<div>
-  // 					{recording ? (
-  // 						<button onClick={stopRecording} title="Stop Recording">
-  // 							<FontAwesomeIcon icon={faSpinner} spin /> {/* Show the spinning icon while processing */}
-  // 						</button>
-  // 					) : (
-  // 						<button onClick={startRecording} title="Start Recording">
-  // 							<FontAwesomeIcon icon={faMicrophone} /> {/* Show the microphone icon when not recording */}
-  // 						</button>
-  // 					)}
-  // 				</div>
-  // 			</div>
-  // 		);
-  // 	}
+    function convertFromBuffer(bytes) {
+      setResponse("Converting text...");
+      setConvertProcess(true);
+      Predictions.convert({
+        transcription: {
+          source: {
+            bytes,
+          },
+          // language: "ja-JP",
+          // language: "en-US", // other options are "en-GB", "fr-FR", "fr-CA", "es-US"
+          language: (() => {
+            if (selectedItem === 0) {
+              console.log(selectedItem);
+              return "ja-JP";
+            } else if (selectedItem === 1) {
+              return "en-US";
+            }
+            // Add additional conditions here if needed
+            return "en-US"; // Provide a default language code
+          })(),
+        },
+      })
+        .then(({ transcription: { fullText } }) => {
+          handleSend(fullText);
+          setConvertProcess(false);
+        })
+        .catch((err) => setResponse(JSON.stringify(err, null, 2)));
+    }
 
-  // 	function convertFromBuffer(bytes) {
-  // 		setResponse("Converting text...");
-  // 		setConvertProcess(true);
-  // 		Predictions.convert({
-  // 			transcription: {
-  // 				source: {
-  // 					bytes,
-  // 				},
-  // 				// language: "ja-JP",
-  // 				// language: "en-US", // other options are "en-GB", "fr-FR", "fr-CA", "es-US"
-  // 				language: (() => {
-  // 					if (selectedItem === 0) {
-  // 						console.log(selectedItem)
-  // 						return "ja-JP";
-  // 					} else if (selectedItem === 1) {
-  // 						return "en-US";
-  // 					}
-  // 					// Add additional conditions here if needed
-  // 					return "en-US"; // Provide a default language code
-  // 				})()
+    return (
+      <div className="Text">
+        <div>
+          <AudioRecorder finishRecording={convertFromBuffer} />
+        </div>
+      </div>
+    );
+  }
 
-  // 			},
-
-  // 		})
-  // 			.then(({ transcription: { fullText } }) => {
-  // 				handleSend(fullText);
-  // 				setConvertProcess(false);
-  // 			})
-  // 			.catch((err) => setResponse(JSON.stringify(err, null, 2)));
-  // 	}
-
-  // 	return (
-  // 		<div className="Text">
-  // 			<div>
-  // 				<AudioRecorder finishRecording={convertFromBuffer} />
-  // 			</div>
-  // 		</div>
-  // 	);
-  // }
-
+  // This use AWS Transcribe, and have the duration selections available
   // function SpeechToText(props) {
   //   const [response, setResponse] = useState();
+  //   const [convertProcess, setConvertProcess] = useState(false);
+  //   const [selectedItem, setSelectedItem] = useState(1); // Assuming 1 for "en-US"
 
   //   function AudioRecorder(props) {
   //     const [recording, setRecording] = useState(false);
@@ -446,6 +449,9 @@ function App() {
   //       setRecording(false);
   //       const resultBuffer = audioBuffer.getData();
 
+  //       // Log a portion of the audio data for debugging
+  //       console.log("Captured audio data:", resultBuffer.slice(0, 100));
+
   //       if (typeof finishRecording === "function") {
   //         finishRecording(resultBuffer);
   //       }
@@ -500,121 +506,6 @@ function App() {
   //     );
   //   }
 
-  //   // function AudioRecorder(props) {
-  //   // 	const [recording, setRecording] = useState(false);
-  //   // 	const [micStream, setMicStream] = useState();
-  //   // 	const [audioBuffer] = useState(() => {
-  //   // 		let buffer = [];
-  //   // 		function add(raw) {
-  //   // 			buffer = buffer.concat(...raw);
-  //   // 			return buffer;
-  //   // 		}
-  //   // 		function newBuffer() {
-  //   // 			console.log('resetting buffer');
-  //   // 			buffer = [];
-  //   // 		}
-
-  //   // 		return {
-  //   // 			reset: function () {
-  //   // 				newBuffer();
-  //   // 			},
-  //   // 			addData: function (raw) {
-  //   // 				return add(raw);
-  //   // 			},
-  //   // 			getData: function () {
-  //   // 				return buffer;
-  //   // 			},
-  //   // 		};
-  //   // 	});
-  //   // 	const [recordTimer, setRecordTimer] = useState(3); // Default recording duration in seconds
-
-  //   // 	const durationOptions = [3, 5, 10, 15]; // Available recording duration options
-
-  //   // 	useEffect(() => {
-  //   // 		let timer;
-  //   // 		if (recording && recordTimer > 0) {
-  //   // 			timer = setInterval(() => {
-  //   // 				setRecordTimer((prevTime) => prevTime - 1);
-  //   // 			}, 1000);
-  //   // 		} else if (recordTimer === 0) {
-  //   // 			stopRecording();
-  //   // 		}
-
-  //   // 		return () => clearInterval(timer);
-  //   // 	}, [recording, recordTimer]);
-
-  //   // 	async function startRecording() {
-  //   // 		console.log('start recording');
-  //   // 		audioBuffer.reset();
-  //   // 		window.navigator.mediaDevices
-  //   // 			.getUserMedia({ video: false, audio: true })
-  //   // 			.then((stream) => {
-  //   // 				const startMic = new mic();
-
-  //   // 				startMic.setStream(stream);
-  //   // 				startMic.on('data', (chunk) => {
-  //   // 					var raw = mic.toRaw(chunk);
-  //   // 					if (raw == null) {
-  //   // 						return;
-  //   // 					}
-  //   // 					audioBuffer.addData(raw);
-  //   // 				});
-
-  //   // 				setRecording(true);
-  //   // 				setMicStream(startMic);
-  //   // 			});
-  //   // 	}
-
-  //   // 	async function stopRecording() {
-  //   // 		console.log('stop recording');
-  //   // 		const { finishRecording } = props;
-
-  //   // 		micStream.stop();
-  //   // 		setMicStream(null);
-  //   // 		setRecording(false);
-
-  //   // 		const resultBuffer = audioBuffer.getData();
-
-  //   // 		if (typeof finishRecording === 'function') {
-  //   // 			finishRecording(resultBuffer);
-  //   // 		}
-  //   // 	}
-
-  //   // 	function handleDurationChange(event) {
-  //   // 		const selectedDuration = parseInt(event.target.value, 10);
-  //   // 		setRecordTimer(selectedDuration);
-  //   // 	}
-
-  //   // 	return (
-  //   // 		<div className="audioRecorder">
-  //   // 			{recording ? (
-  //   // 				<>
-  //   // 					<button onClick={stopRecording} title="Stop Recording">
-  //   // 						<FontAwesomeIcon icon={faSpinner} spin />
-  //   // 					</button>
-  //   // 					<div>Time Left: {recordTimer} seconds</div>
-  //   // 				</>
-  //   // 			) : (
-  //   // 				<>
-  //   // 					<button onClick={startRecording} title="Start Recording">
-  //   // 						<FontAwesomeIcon icon={faMicrophone} />
-  //   // 					</button>
-  //   // 					<div>
-  //   // 						Recording Duration:
-  //   // 						<select value={recordTimer} onChange={handleDurationChange}>
-  //   // 							{durationOptions.map((duration) => (
-  //   // 								<option key={duration} value={duration}>
-  //   // 									{duration} seconds
-  //   // 								</option>
-  //   // 							))}
-  //   // 						</select>
-  //   // 					</div>
-  //   // 				</>
-  //   // 			)}
-  //   // 		</div>
-  //   // 	);
-  //   // }
-
   //   function convertFromBuffer(bytes) {
   //     setResponse("Converting text...");
   //     setConvertProcess(true);
@@ -652,206 +543,276 @@ function App() {
   //   );
   // }
 
-  function SpeechToText(props) {
-    const [response, setResponse] = useState();
-    const [convertProcess, setConvertProcess] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(1); // Assuming 1 for "en-US"
+  // This use whisper AI, although it is still not working properly
+  // function SpeechToText(props) {
+  //   const [response, setResponse] = useState();
+  //   const [convertProcess, setConvertProcess] = useState(false);
+  //   const [selectedItem, setSelectedItem] = useState(1); // Assuming 1 for "en-US"
 
-    function AudioRecorder(props) {
-      const [recording, setRecording] = useState(false);
-      const [micStream, setMicStream] = useState();
-      const [audioBuffer] = useState(() => {
-        let buffer = [];
-        function add(raw) {
-          buffer = buffer.concat(...raw);
-          return buffer;
-        }
-        function newBuffer() {
-          buffer = [];
-        }
+  //   function AudioRecorder(props) {
+  //     const [recording, setRecording] = useState(false);
+  //     const [micStream, setMicStream] = useState();
+  //     const [audioBuffer] = useState(() => {
+  //       let buffer = [];
+  //       function add(raw) {
+  //         buffer = buffer.concat(...raw);
+  //         return buffer;
+  //       }
+  //       function newBuffer() {
+  //         buffer = [];
+  //       }
 
-        return {
-          reset: function () {
-            newBuffer();
-          },
-          addData: function (raw) {
-            return add(raw);
-          },
-          getData: function () {
-            return buffer;
-          },
-        };
-      });
+  //       return {
+  //         reset: function () {
+  //           newBuffer();
+  //         },
+  //         addData: function (raw) {
+  //           return add(raw);
+  //         },
+  //         getData: function () {
+  //           return buffer;
+  //         },
+  //       };
+  //     });
 
-      const [selectedDuration, setSelectedDuration] = useState(() => {
-        const storedDuration = localStorage.getItem("originalSelectedDuration");
-        return storedDuration ? parseInt(storedDuration, 10) : 5; // Default value if not found
-      });
+  //     const [selectedDuration, setSelectedDuration] = useState(() => {
+  //       const storedDuration = localStorage.getItem("originalSelectedDuration");
+  //       return storedDuration ? parseInt(storedDuration, 10) : 5; // Default value if not found
+  //     });
 
-      const [countdown, setCountdown] = useState(() => selectedDuration);
+  //     const [countdown, setCountdown] = useState(() => selectedDuration);
 
-      const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
-      const [isOpen, setOpen] = useState(false);
+  //     const durationOptions = [3, 5, 10, 15, 30, 40, 50, 60]; // Available recording duration options
+  //     const [isOpen, setOpen] = useState(false);
 
-      const toggleDropdown = () => setOpen(!isOpen);
+  //     const toggleDropdown = () => setOpen(!isOpen);
 
-      useEffect(() => {
-        let timer;
-        if (recording && countdown > 0) {
-          timer = setInterval(() => {
-            setCountdown((prevCountdown) => prevCountdown - 1);
-          }, 1000);
-        } else if (countdown === 0) {
-          stopRecording();
-          setCountdown(0);
-        }
+  //     useEffect(() => {
+  //       let timer;
+  //       if (recording && countdown > 0) {
+  //         timer = setInterval(() => {
+  //           setCountdown((prevCountdown) => prevCountdown - 1);
+  //         }, 1000);
+  //       } else if (countdown === 0) {
+  //         stopRecording();
+  //         setCountdown(0);
+  //       }
 
-        return () => clearInterval(timer);
-      }, [recording, countdown]);
+  //       return () => clearInterval(timer);
+  //     }, [recording, countdown]);
 
-      const startRecording = async () => {
-        audioBuffer.reset();
-        setCountdown(selectedDuration); // Reset the countdown to the original selected duration
-        try {
-          const stream = await window.navigator.mediaDevices.getUserMedia({
-            video: false,
-            audio: true,
-          });
-          const startMic = new mic();
+  //     const startRecording = async () => {
+  //       audioBuffer.reset();
+  //       setCountdown(selectedDuration); // Reset the countdown to the original selected duration
+  //       try {
+  //         const stream = await window.navigator.mediaDevices.getUserMedia({
+  //           video: false,
+  //           audio: true,
+  //         });
+  //         const startMic = new mic();
 
-          startMic.setStream(stream);
-          startMic.on("data", (chunk) => {
-            var raw = mic.toRaw(chunk);
-            if (raw == null) {
-              return;
-            }
-            audioBuffer.addData(raw);
-          });
+  //         startMic.setStream(stream);
+  //         startMic.on("data", (chunk) => {
+  //           var raw = mic.toRaw(chunk);
+  //           if (raw == null) {
+  //             return;
+  //           }
+  //           audioBuffer.addData(raw);
+  //         });
 
-          setRecording(true);
-          setMicStream(startMic);
-        } catch (error) {
-          console.error("Error starting recording:", error);
-        }
-      };
+  //         setRecording(true);
+  //         setMicStream(startMic);
+  //       } catch (error) {
+  //         console.error("Error starting recording:", error);
+  //       }
+  //     };
 
-      const stopRecording = () => {
-        const { finishRecording } = props;
+  //     const stopRecording = () => {
+  //       const { finishRecording } = props;
 
-        if (micStream) {
-          micStream.stop();
-          setMicStream(null);
-        }
+  //       if (micStream) {
+  //         micStream.stop();
+  //         setMicStream(null);
+  //       }
 
-        setRecording(false);
-        const resultBuffer = audioBuffer.getData();
+  //       setRecording(false);
+  //       const resultBuffer = audioBuffer.getData();
 
-        if (typeof finishRecording === "function") {
-          finishRecording(resultBuffer);
-        }
-        localStorage.setItem("originalSelectedDuration", selectedDuration);
-      };
+  //       // Log a portion of the audio data for debugging
+  //       console.log("Captured audio data:", resultBuffer.slice(0, 100));
 
-      const handleDurationChange = (duration) => {
-        setSelectedDuration(duration);
-        toggleDropdown(); // Close the dropdown when a duration is selected
-        setCountdown(duration); // Reset the countdown when the duration changes
-      };
+  //       if (typeof finishRecording === "function") {
+  //         finishRecording(resultBuffer);
+  //       }
+  //       localStorage.setItem("originalSelectedDuration", selectedDuration);
+  //     };
 
-      return (
-        <div className="audioRecorder">
-          {recording ? (
-            <>
-              <button onClick={stopRecording} title="Stop Recording">
-                <FontAwesomeIcon icon={faSpinner} spin />
-              </button>
-              <div>Time Left: {countdown} seconds</div>
-            </>
-          ) : (
-            <>
-              <button onClick={startRecording} title="Start Recording">
-                <FontAwesomeIcon icon={faMicrophone} />
-              </button>
-              <div className="dropdown">
-                <div className="dropdown-header" onClick={toggleDropdown}>
-                  {selectedDuration} seconds
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className={`icon ${isOpen && "open"}`}
-                  />
-                </div>
-                <div className={`dropdown-body ${isOpen && "open"}`}>
-                  {durationOptions.map((duration) => (
-                    <div
-                      className={`dropdown-item ${
-                        duration === selectedDuration && "selected"
-                      }`}
-                      onClick={() => handleDurationChange(duration)}
-                      key={duration}
-                    >
-                      {duration} seconds
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      );
-    }
+  //     const handleDurationChange = (duration) => {
+  //       setSelectedDuration(duration);
+  //       toggleDropdown(); // Close the dropdown when a duration is selected
+  //       setCountdown(duration); // Reset the countdown when the duration changes
+  //     };
 
-    async function convertFromBuffer(bytes) {
-      const jsonString = JSON.stringify(bytes)
-      const buffer = Buffer.from(jsonString)
-      console.log(Buffer.isBuffer(buffer));
-      setResponse("Converting text...");
-      setConvertProcess(true);
-      // Convert buffer to Blob
-      const blob = new Blob([new Uint8Array(buffer)], { type: "audio/mp3" });
-      const audiofile = new File([blob], 'audiofile.mp3', {
-        type: 'audio/mpeg',
-      });
-      const formData = new FormData();
-      formData.append("file", audiofile); 
-      formData.append("model", "whisper-1");
-      formData.append("response_format", "text");
+  //     return (
+  //       <div className="audioRecorder">
+  //         {recording ? (
+  //           <>
+  //             <button onClick={stopRecording} title="Stop Recording">
+  //               <FontAwesomeIcon icon={faSpinner} spin />
+  //             </button>
+  //             <div>Time Left: {countdown} seconds</div>
+  //           </>
+  //         ) : (
+  //           <>
+  //             <button onClick={startRecording} title="Start Recording">
+  //               <FontAwesomeIcon icon={faMicrophone} />
+  //             </button>
+  //             <div className="dropdown">
+  //               <div className="dropdown-header" onClick={toggleDropdown}>
+  //                 {selectedDuration} seconds
+  //                 <FontAwesomeIcon
+  //                   icon={faChevronRight}
+  //                   className={`icon ${isOpen && "open"}`}
+  //                 />
+  //               </div>
+  //               <div className={`dropdown-body ${isOpen && "open"}`}>
+  //                 {durationOptions.map((duration) => (
+  //                   <div
+  //                     className={`dropdown-item ${
+  //                       duration === selectedDuration && "selected"
+  //                     }`}
+  //                     onClick={() => handleDurationChange(duration)}
+  //                     key={duration}
+  //                   >
+  //                     {duration} seconds
+  //                   </div>
+  //                 ))}
+  //               </div>
+  //             </div>
+  //           </>
+  //         )}
+  //       </div>
+  //     );
+  //   }
 
-      try {
-        const transcriptionResponse = await axios.post(
-          "https://api.openai.com/v1/audio/transcriptions",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
-              "Content-Type": "multipart/form-data"
+  //   async function convertFromBuffer(bytes) {
+  //     setResponse("Converting text...");
+  //     setConvertProcess(true);
 
-            },
-          }
-        );
-        
+  //     try {
+  //       // Log the length and a portion of the bytes array for inspection
+  //       console.log("Audio bytes length:", bytes.length);
+  //       console.log("Audio bytes sample:", bytes.slice(0, 20));
 
-        const transcribedText = transcriptionResponse.data;
-        console.log(`>> You said: ${transcribedText}`);
+  //       // Validate that the audio data is not all zeros
+  //       const isValidData = bytes.some((byte) => byte !== 0);
+  //       if (!isValidData) {
+  //         throw new Error("Recorded audio data is invalid (all zeros).");
+  //       }
 
-        setResponse(transcribedText);
-        setConvertProcess(false);
-      } catch (error) {
-        console.error("Error during transcription:", error);
-        setResponse("Error during transcription");
-        setConvertProcess(false);
-      }
-    }
+  //       // Create a valid WAV file header
+  //       const header = createWavHeader(bytes.length, 44100, 1, 16);
+  //       const wavData = new Uint8Array(header.length + bytes.length);
+  //       wavData.set(header, 0);
+  //       wavData.set(bytes, header.length);
 
-    return (
-      <div className="Text">
-        <div>
-          <AudioRecorder finishRecording={convertFromBuffer} />
-        </div>
-        {convertProcess && <div>Converting...</div>}
-        {response && <div>{response}</div>}
-      </div>
-    );
-  }
+  //       // Convert the combined array to a Blob
+  //       const blob = new Blob([wavData], { type: "audio/wav" });
+
+  //       // Create a File object from the Blob
+  //       const audiofile = new File([blob], "audiofile.wav", {
+  //         type: "audio/wav",
+  //       });
+
+  //       // Optional: Save the blob to verify its content
+  //       const url = URL.createObjectURL(blob);
+  //       console.log("Audio file URL:", url);
+  //       // window.open(url); // Uncomment to open the audio file in a new tab
+
+  //       const formData = new FormData();
+  //       formData.append("file", audiofile);
+  //       formData.append("model", "whisper-1");
+  //       formData.append("response_format", "text");
+
+  //       // Send the audio file to the transcription API
+  //       const transcriptionResponse = await axios.post(
+  //         "https://api.openai.com/v1/audio/transcriptions",
+  //         formData,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //           maxBodyLength: 10000,
+  //           maxContentLength: 10000,
+  //         }
+  //       );
+
+  //       // Log the entire response to understand its structure
+  //       console.log("Full response:", transcriptionResponse);
+
+  //       // Attempt to access the transcribed text
+  //       const transcribedText = transcriptionResponse.data; // Access the plain text response directly
+  //       console.log(`>> You said: ${transcribedText}`);
+
+  //       // Set the response
+  //       setResponse(transcribedText);
+  //     } catch (error) {
+  //       console.error(
+  //         "Error during transcription:",
+  //         error.response ? error.response.data : error.message
+  //       );
+  //       setResponse("Error during transcription");
+  //     } finally {
+  //       setConvertProcess(false);
+  //     }
+  //   }
+
+  //   // Function to create a WAV file header
+  //   function createWavHeader(dataSize, sampleRate, numChannels, bitsPerSample) {
+  //     const header = new ArrayBuffer(44);
+  //     const view = new DataView(header);
+
+  //     /* RIFF identifier */
+  //     view.setUint32(0, 0x52494646, false); // "RIFF"
+  //     /* file length minus RIFF identifier length and file description length */
+  //     view.setUint32(4, 36 + dataSize, true);
+  //     /* RIFF type */
+  //     view.setUint32(8, 0x57415645, false); // "WAVE"
+  //     /* format chunk identifier */
+  //     view.setUint32(12, 0x666d7420, false); // "fmt "
+  //     /* format chunk length */
+  //     view.setUint32(16, 16, true);
+  //     /* sample format (raw) */
+  //     view.setUint16(20, 1, true);
+  //     /* channel count */
+  //     view.setUint16(22, numChannels, true);
+  //     /* sample rate */
+  //     view.setUint32(24, sampleRate, true);
+  //     /* byte rate (sample rate * block align) */
+  //     view.setUint32(28, (sampleRate * numChannels * bitsPerSample) / 8, true);
+  //     /* block align (channel count * bytes per sample) */
+  //     view.setUint16(32, (numChannels * bitsPerSample) / 8, true);
+  //     /* bits per sample */
+  //     view.setUint16(34, bitsPerSample, true);
+  //     /* data chunk identifier */
+  //     view.setUint32(36, 0x64617461, false); // "data"
+  //     /* data chunk length */
+  //     view.setUint32(40, dataSize, true);
+
+  //     return new Uint8Array(header);
+  //   }
+
+  //   return (
+  //     <div className="Text">
+  //       <div>
+  //         <AudioRecorder finishRecording={convertFromBuffer} />
+  //       </div>
+  //       {convertProcess && <div>Converting...</div>}
+  //       {response && <div>{response}</div>}
+  //     </div>
+  //   );
+  // }
 
   function TextToSpeech({ generatedText }) {
     const [response, setResponse] = useState("...");
