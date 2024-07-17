@@ -30,7 +30,7 @@ import { CSVLink, CSVDownload } from "react-csv";
 import * as PIXI from "pixi.js";
 import { Live2DModel } from "pixi-live2d-display/dist/cubism4.js";
 // const { Live2DModel } = require("pixi-live2d-display/dist/cubism4.js");
-import { useHotkeys } from 'react-hotkeys-hook'
+import { useHotkeys } from "react-hotkeys-hook";
 
 window.PIXI = PIXI;
 
@@ -49,9 +49,7 @@ function App() {
   const csvLink = useRef();
   var [messages, setMessages] = useState([]);
   var [selectedModel, setSelectedModel] = useState();
-  useHotkeys('ctrl+k', () => {
-    alert("test")
-  });
+
   useEffect(() => {
     const app = new PIXI.Application({
       view: document.getElementById("canvas"),
@@ -459,12 +457,18 @@ function App() {
         localStorage.setItem("originalSelectedDuration", selectedDuration);
       };
 
+      useHotkeys("ctrl+k", () => {
+        startRecording();
+      });
+      useHotkeys("ctrl+l", () => {
+        stopRecording();
+      });
+
       const handleDurationChange = (duration) => {
         setSelectedDuration(duration);
         toggleDropdown(); // Close the dropdown when a duration is selected
         setCountdown(duration); // Reset the countdown when the duration changes
       };
-
 
       return (
         <div className="audioRecorder">
@@ -535,7 +539,6 @@ function App() {
         })
         .catch((err) => setResponse(JSON.stringify(err, null, 2)));
     }
-  
 
     return (
       <div className="Text">
@@ -843,6 +846,10 @@ function App() {
     function toggleTextToSpeech() {
       setTextToSpeechEnabled((prevState) => !prevState); // Toggle the state to enable or disable text-to-speech
     }
+
+    useHotkeys("ctrl+m", () => {
+      toggleTextToSpeech();
+    });
 
     async function generateTextToSpeech() {
       setResponse("Generating audio...");
@@ -1461,7 +1468,7 @@ function App() {
                   <MessageInput
                     placeholder="Type message here"
                     onSend={handleSend}
-                    autoFocus
+                    // autoFocus
                     onAttachClick={() => generateCsv()}
                     attachButton={true}
                   ></MessageInput>
