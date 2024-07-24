@@ -49,6 +49,7 @@ function App() {
   const csvLink = useRef();
   var [messages, setMessages] = useState([]);
   var [selectedModel, setSelectedModel] = useState();
+  const [source, setSource] = useState();
 
   useEffect(() => {
     const app = new PIXI.Application({
@@ -826,7 +827,8 @@ function App() {
     const [isOpen, setOpen] = useState(false);
     const [items, setItem] = useState(data);
     const toggleDropdown = () => setOpen(!isOpen);
-
+    let AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
     const handleItemClick = (id) => {
       setSelectedItem(id);
     };
@@ -849,6 +851,9 @@ function App() {
 
     useHotkeys("ctrl+m", () => {
       toggleTextToSpeech();
+    });
+    useHotkeys("ctrl+e", () => {
+      source.stop(0);
     });
 
     async function generateTextToSpeech() {
@@ -884,18 +889,19 @@ function App() {
           return; // Return early if text-to-speech is disabled before the generation completes
         }
 
-        let AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createBufferSource();
+        if (source) {
+          source.stop(0);
+        }
+        const audioSource = audioCtx.createBufferSource();
 
         audioCtx.decodeAudioData(
           arrayBuffer,
           (buffer) => {
             startMouthAnimation();
-            source.buffer = buffer;
-            source.connect(audioCtx.destination);
-            source.start(0);
-            source.addEventListener("ended", () => {
+            audioSource.buffer = buffer;
+            audioSource.connect(audioCtx.destination);
+            audioSource.start(0);
+            audioSource.addEventListener("ended", () => {
               stopMouthAnimation();
             });
           },
@@ -904,6 +910,7 @@ function App() {
           }
         );
 
+        setSource(audioSource);
         setResponse(`Generation completed, press play`);
       } catch (error) {
         // Handle errors from the API or the audio processing
@@ -912,6 +919,13 @@ function App() {
         stopMouthAnimation();
       }
     }
+
+    useEffect(() => {
+      if (!textToSpeechEnabled && audioCtx) {
+        audioCtx.close();
+        setSource(null);
+      }
+    }, [textToSpeechEnabled]);
 
     return (
       // <div className="TextToSpeech">
