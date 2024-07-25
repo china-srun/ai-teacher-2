@@ -1240,6 +1240,9 @@ function App() {
     if (id === 3) {
       setShowLevels(!showLevels);
     }
+    if (source) {
+      source.stop(0)
+    }
   };
   const handleChange = (event, newValue) => {
     setSelectedTheme(parseInt(newValue));
