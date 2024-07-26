@@ -31,6 +31,7 @@ import * as PIXI from "pixi.js";
 import { Live2DModel } from "pixi-live2d-display/dist/cubism4.js";
 // const { Live2DModel } = require("pixi-live2d-display/dist/cubism4.js");
 import { useHotkeys } from "react-hotkeys-hook";
+import Modal from "./components/Modal";
 
 window.PIXI = PIXI;
 
@@ -50,6 +51,15 @@ function App() {
   var [messages, setMessages] = useState([]);
   var [selectedModel, setSelectedModel] = useState();
   const [source, setSource] = useState();
+  const [open, setOpen] = useState(true);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
   useEffect(() => {
     const app = new PIXI.Application({
@@ -847,6 +857,9 @@ function App() {
 
     function toggleTextToSpeech() {
       setTextToSpeechEnabled((prevState) => !prevState); // Toggle the state to enable or disable text-to-speech
+      if (source) {
+        source.stop(0);
+      }
     }
 
     useHotkeys("ctrl+m", () => {
@@ -1241,7 +1254,7 @@ function App() {
       setShowLevels(!showLevels);
     }
     if (source) {
-      source.stop(0)
+      source.stop(0);
     }
   };
   const handleChange = (event, newValue) => {
@@ -1359,143 +1372,166 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <div className="container">
-        <div className="textToSpeechContainer">
-          <div className="avatarContainer">
-            {/* <div className="themeContainer">
-							<h3>Choose Theme: </h3>
-							<ThemeDropdown />
+    <>
+      <div className="App">
+        <div className="container">
+          <div className="textToSpeechContainer">
+            <div className="avatarContainer">
+              {/* <div className="themeContainer">
+  							<h3>Choose Theme: </h3>
+  							<ThemeDropdown />
+  
+  						</div> */}
 
-						</div> */}
-
-            {/* <Select
-              defaultValue="0"
-              onChange={handleChange}
-              placeholder="Select a Theme"
-            >
-              <Option value="0">Free Talk</Option>
-              <Option value="1">Cafe</Option>
-              <Option value="2">School</Option>
-            </Select>
-            <Select
-              onChange={handleChange}
-              placeholder="Select a Pronunciation"
-            >
-              <Option value="3">Third Grade Level</Option>
-              <Option value="4">Graduate Level</Option>
-              <Option value="5">News Level</Option>
-            </Select> */}
-            <div className="themeContainer">
-              <div className="">
-                <p>Theme</p>
-                <ThemeDropdown
-                  items={firstThreeItems}
-                  selectedTheme={selectedTheme}
-                  handleItemClick={handleItemClick}
-                />
-              </div>
-
-              <div>
-                <p>Pronunciation</p>
-                <ThemeDropdown
-                  items={remainingItems}
-                  selectedTheme={selectedTheme}
-                  handleItemClick={handleItemClick}
-                />
-              </div>
-            </div>
-            {/* <img
-              className="avatar"
-              id="avatar"
-              src={
-                selectedTheme === 0
-                  ? freetalk
-                  : selectedTheme === 1
-                  ? cafe
-                  : selectedTheme === 2
-                  ? school
-                  : selectedTheme === 3
-                  ? prononciation
-                  : cafe // The default option if none of the themes match
-              }
-              alt="avatar"
-            /> */}
-            <canvas id="canvas" className="avatar" />
-          </div>
-          <div className="buttonsContainer">
-            <div className="buttons">
-              <SpeechToText />
-              <TextToSpeech generatedText={generatedText} />
-              {/* <LanguageDropdown /> */}
-            </div>
-          </div>
-          <div>
-            <CSVLink
-              data={csvData}
-              filename="chat-history.csv"
-              ref={csvLink}
-            ></CSVLink>
-          </div>
-        </div>
-        <div className="chatContainer">
-          <div style={{ height: "100vh" }}>
-            <MainContainer>
-              <ChatContainer>
-                <ConversationHeader>
-                  {/* <Avatar src={icon} name="Akane" /> */}
-                  {/* <ConversationHeader.Content
-                    userName={
-                      selectedTheme === 0
-                        ? "Friend Kayndis"
-                        : selectedTheme === 1
-                        ? "Barista Jessy"
-                        : selectedTheme === 2
-                        ? "Professor Clerk"
-                        : selectedTheme === 3
-                        ? "Prononciation Checker John (Junior high school third grade level)"
-                        : selectedTheme === 4
-                        ? "Prononciation Checker John (High school graduate level)"
-                        : selectedTheme === 5
-                        ? "Prononciation Checker John (News level)"
-                        : "ChatGPT"
-                    }
-                    info="Active Now"
-                  /> */}
-                </ConversationHeader>
-                <MessageList
-                  scrollBehavior="smooth"
-                  typingIndicator={
-                    typing ? (
-                      <TypingIndicator content="Your AI Teacher is typing" />
-                    ) : convertProcess === true ? (
-                      <TypingIndicator content="Converting text..." />
-                    ) : null
-                  }
-                >
-                  {messages.map((message, index) => {
-                    return (
-                      <Message key={index} model={message}>
-                        {/* <Avatar src={icon} name="Joe" size="md" /> */}
-                      </Message>
-                    );
-                  })}
-                </MessageList>
-                <div as="MessageInput">
-                  <MessageInput
-                    placeholder="Type message here"
-                    onSend={handleSend}
-                    // autoFocus
-                    onAttachClick={() => generateCsv()}
-                    attachButton={true}
-                  ></MessageInput>
+              {/* <Select
+                defaultValue="0"
+                onChange={handleChange}
+                placeholder="Select a Theme"
+              >
+                <Option value="0">Free Talk</Option>
+                <Option value="1">Cafe</Option>
+                <Option value="2">School</Option>
+              </Select>
+              <Select
+                onChange={handleChange}
+                placeholder="Select a Pronunciation"
+              >
+                <Option value="3">Third Grade Level</Option>
+                <Option value="4">Graduate Level</Option>
+                <Option value="5">News Level</Option>
+              </Select> */}
+              <div className="themeContainer">
+                <div className="">
+                  <p>Theme</p>
+                  <ThemeDropdown
+                    items={firstThreeItems}
+                    selectedTheme={selectedTheme}
+                    handleItemClick={handleItemClick}
+                  />
                 </div>
-              </ChatContainer>
-            </MainContainer>
+
+                <div>
+                  <p>Pronunciation</p>
+                  <ThemeDropdown
+                    items={remainingItems}
+                    selectedTheme={selectedTheme}
+                    handleItemClick={handleItemClick}
+                  />
+                </div>
+              </div>
+              {/* <img
+                className="avatar"
+                id="avatar"
+                src={
+                  selectedTheme === 0
+                    ? freetalk
+                    : selectedTheme === 1
+                    ? cafe
+                    : selectedTheme === 2
+                    ? school
+                    : selectedTheme === 3
+                    ? prononciation
+                    : cafe // The default option if none of the themes match
+                }
+                alt="avatar"
+              /> */}
+              <canvas id="canvas" className="avatar" />
+            </div>
+            <div className="buttonsContainer">
+              <div className="buttons">
+                <SpeechToText />
+                <TextToSpeech generatedText={generatedText} />
+                {/* <LanguageDropdown /> */}
+              </div>
+            </div>
+            <div>
+              <CSVLink
+                data={csvData}
+                filename="chat-history.csv"
+                ref={csvLink}
+              ></CSVLink>
+            </div>
+          </div>
+          <div className="chatContainer">
+            <div style={{ height: "100vh" }}>
+              <MainContainer>
+                <ChatContainer>
+                  <ConversationHeader>
+                    {/* <Avatar src={icon} name="Akane" /> */}
+                    {/* <ConversationHeader.Content
+                      userName={
+                        selectedTheme === 0
+                          ? "Friend Kayndis"
+                          : selectedTheme === 1
+                          ? "Barista Jessy"
+                          : selectedTheme === 2
+                          ? "Professor Clerk"
+                          : selectedTheme === 3
+                          ? "Prononciation Checker John (Junior high school third grade level)"
+                          : selectedTheme === 4
+                          ? "Prononciation Checker John (High school graduate level)"
+                          : selectedTheme === 5
+                          ? "Prononciation Checker John (News level)"
+                          : "ChatGPT"
+                      }
+                      info="Active Now"
+                    /> */}
+                  </ConversationHeader>
+                  <MessageList
+                    scrollBehavior="smooth"
+                    typingIndicator={
+                      typing ? (
+                        <TypingIndicator content="Your AI Teacher is typing" />
+                      ) : convertProcess === true ? (
+                        <TypingIndicator content="Converting text..." />
+                      ) : null
+                    }
+                  >
+                    {messages.map((message, index) => {
+                      return (
+                        <Message key={index} model={message}>
+                          {/* <Avatar src={icon} name="Joe" size="md" /> */}
+                        </Message>
+                      );
+                    })}
+                  </MessageList>
+                  <div as="MessageInput">
+                    <MessageInput
+                      placeholder="Type message here"
+                      onSend={handleSend}
+                      // autoFocus
+                      onAttachClick={() => generateCsv()}
+                      attachButton={true}
+                    ></MessageInput>
+                  </div>
+                </ChatContainer>
+              </MainContainer>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div>
+        <Modal isOpen={open} onClose={handleClose} className="modal-container">
+          <>
+            <h3 style={{ marginBottom: "10px" }}>Keyboard Shortcuts</h3>
+            <ul style={{ paddingLeft: "20px" }}>
+              <li>
+                <strong>Ctrl + E</strong> to stop the audio
+              </li>
+              <li>
+                <strong>Ctrl + M</strong> to mute the audio
+              </li>
+              <li>
+                <strong>Ctrl + K</strong> to start the recording
+              </li>
+              <li>
+                <strong>Ctrl + L</strong> to stop the recording
+              </li>
+            </ul>
+          </>
+        </Modal>
+      </div>
+    </>
   );
 }
 
