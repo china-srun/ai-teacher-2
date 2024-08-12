@@ -100,13 +100,9 @@ function App() {
       ]);
     } else if (selectedTheme === 1 && selectedItem === 1) {
       setGeneratedText("");
-      setMessages([
-        {
-          message:
-            "Hey there! Welcome to Nakama Cafe. How can I assist you today?",
-          sender: "user",
-        },
-      ]);
+      firstSend(
+        "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response."
+      );
     } else if (selectedTheme === 2 && selectedItem === 1) {
       setGeneratedText("");
       setMessages([
@@ -838,7 +834,6 @@ function App() {
     const [items, setItem] = useState(data);
     const toggleDropdown = () => setOpen(!isOpen);
     let AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioCtx = new AudioContext();
     const handleItemClick = (id) => {
       setSelectedItem(id);
     };
@@ -905,7 +900,9 @@ function App() {
         if (source) {
           source.stop(0);
         }
+        const audioCtx = new AudioContext();
         const audioSource = audioCtx.createBufferSource();
+
 
         audioCtx.decodeAudioData(
           arrayBuffer,
@@ -924,7 +921,6 @@ function App() {
         );
 
         setSource(audioSource);
-        setResponse(`Generation completed, press play`);
       } catch (error) {
         // Handle errors from the API or the audio processing
         console.error(`Error: ${error.message}`);
@@ -933,12 +929,12 @@ function App() {
       }
     }
 
-    useEffect(() => {
-      if (!textToSpeechEnabled && audioCtx) {
-        audioCtx.close();
-        setSource(null);
-      }
-    }, [textToSpeechEnabled]);
+    // useEffect(() => {
+    //   if (!textToSpeechEnabled && audioCtx) {
+    //     audioCtx.close();
+    //     setSource(null);
+    //   }
+    // }, [textToSpeechEnabled]);
 
     return (
       // <div className="TextToSpeech">
@@ -1075,7 +1071,7 @@ function App() {
     } else if (selectedItem === 1 && selectedTheme === 1) {
       token = 200;
       content =
-        "Before you start, rememeber to limit the number of words of the response to be shorter than 50 words. I want you to act as a barista from nakama cafe, you will communicate with me as a barista to a client. And don't mention barista for the response";
+        "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you,  and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response.";
     } else if (selectedItem === 1 && selectedTheme === 2) {
       token = 200;
       content =
