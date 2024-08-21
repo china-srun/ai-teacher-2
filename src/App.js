@@ -79,21 +79,18 @@ function App() {
       setSelectedModel(model);
       model.anchor.set(0.5, 0.52);
 
-      // Function to update the model's position based on screen size
       const updateModelPosition = () => {
         const { innerWidth, innerHeight } = window;
 
-        // Adjust the position based on screen size
         const xPosition = innerWidth / 2;
         const yPosition = innerHeight / 2;
 
         model.position.set(xPosition, yPosition);
 
-        // Optional: Adjust the scale or other properties based on screen size
         if (innerWidth < 1600) {
-          model.scale.set(0.16, 0.16); // Smaller scale for smaller screens
+          model.scale.set(0.16, 0.16);
         } else {
-          model.scale.set(0.2, 0.2); // Default scale
+          model.scale.set(0.2, 0.2); 
         }
       };
 
