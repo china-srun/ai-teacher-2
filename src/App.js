@@ -94,10 +94,8 @@ function App() {
         }
       };
 
-      // Set initial position
       updateModelPosition();
 
-      // Listen for screen resize events
       window.addEventListener("resize", updateModelPosition);
 
       model.on("hit", (hitAreas) => {
