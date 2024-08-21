@@ -78,8 +78,30 @@ function App() {
     ).then((model) => {
       setSelectedModel(model);
       model.anchor.set(0.5, 0.52);
-      model.position.set(window.innerWidth / 2, window.innerHeight / 2);
-      model.scale.set(0.2, 0.2);
+
+      // Function to update the model's position based on screen size
+      const updateModelPosition = () => {
+        const { innerWidth, innerHeight } = window;
+
+        // Adjust the position based on screen size
+        const xPosition = innerWidth / 2;
+        const yPosition = innerHeight / 2;
+
+        model.position.set(xPosition, yPosition);
+
+        // Optional: Adjust the scale or other properties based on screen size
+        if (innerWidth < 1600) {
+          model.scale.set(0.16, 0.16); // Smaller scale for smaller screens
+        } else {
+          model.scale.set(0.2, 0.2); // Default scale
+        }
+      };
+
+      // Set initial position
+      updateModelPosition();
+
+      // Listen for screen resize events
+      window.addEventListener("resize", updateModelPosition);
 
       model.on("hit", (hitAreas) => {
         if (hitAreas.includes("body")) {
@@ -902,7 +924,6 @@ function App() {
         }
         const audioCtx = new AudioContext();
         const audioSource = audioCtx.createBufferSource();
-
 
         audioCtx.decodeAudioData(
           arrayBuffer,
