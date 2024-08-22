@@ -80,6 +80,32 @@ code {
   z-index: 1; /* or any high value */
 
 }
+.level-dropdown {
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  z-index: 2;
+}
+
+.level-dropdown p {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.level-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.level-item:hover {
+  background-color: #f0f0f0;
+}
+.level-item.selected {
+  background-color: #d3e5ff;
+}
+
 
 .buttonsContainer {
   margin-top: 1vh;;

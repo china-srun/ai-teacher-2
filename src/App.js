@@ -52,6 +52,8 @@ function App() {
   var [selectedModel, setSelectedModel] = useState();
   const [source, setSource] = useState();
   const [open, setOpen] = useState(true);
+  const [showLevel, setShowLevel] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState(0);
 
   const handleClose = () => {
     setOpen(false);
@@ -90,7 +92,7 @@ function App() {
         if (innerWidth < 1600) {
           model.scale.set(0.16, 0.16);
         } else {
-          model.scale.set(0.2, 0.2); 
+          model.scale.set(0.2, 0.2);
         }
       };
 
@@ -116,10 +118,31 @@ function App() {
         },
       ]);
     } else if (selectedTheme === 1 && selectedItem === 1) {
-      setGeneratedText("");
-      firstSend(
-        "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response."
-      );
+      if (selectedLevel === 0) {
+      } else {
+        switch (selectedLevel) {
+          case 1:
+            setGeneratedText("");
+            firstSend(
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission easier, since this is a level 1"
+            );
+            break;
+          case 2:
+            setGeneratedText("");
+            firstSend(
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission a little hard, since this is a level 2"
+            );
+            break;
+          case 3:
+            setGeneratedText("");
+            firstSend(
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission hard, since this is a level 3"
+            );
+            break;
+          default:
+            break;
+        }
+      }
     } else if (selectedTheme === 2 && selectedItem === 1) {
       setGeneratedText("");
       setMessages([
@@ -190,7 +213,7 @@ function App() {
         "「ユーザーのスピーキング練習に役立つ日本語の文, 50 語以上 を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」"
       );
     }
-  }, [selectedTheme, selectedItem]);
+  }, [selectedTheme, selectedItem, selectedLevel]);
 
   // useEffect(() => {
   // 	if (messages.length > 0) {
@@ -1262,13 +1285,21 @@ function App() {
 
   const handleItemClick = (id) => {
     setSelectedTheme(parseInt(id));
+
     if (id === 3) {
       setShowLevels(!showLevels);
+    }
+    if (id === 1) {
+      setShowLevel(true);
+    } else {
+      setShowLevel(false);
     }
     if (source) {
       source.stop(0);
     }
   };
+  const levelOptions = ["Level 1", "Level 2", "Level 3"];
+
   const handleChange = (event, newValue) => {
     setSelectedTheme(parseInt(newValue));
     if (parseInt(newValue) === 3) {
@@ -1382,6 +1413,10 @@ function App() {
     coreModel.setParameterValueById("ParamMouthOpenY", 0);
     coreModel.setParameterValueById("ParamMouthForm", 0);
   }
+  const handleLevelSelect = (level) => {
+    setSelectedLevel(level);
+    console.log(level);
+  };
 
   return (
     <>
@@ -1420,6 +1455,22 @@ function App() {
                     selectedTheme={selectedTheme}
                     handleItemClick={handleItemClick}
                   />
+                  {showLevel && (
+                    <div className="level-dropdown">
+                      <p>Please choose a level:</p>
+                      {levelOptions.map((level, index) => (
+                        <div
+                          key={index}
+                          className={`level-item ${
+                            selectedLevel === index + 1 ? "selected" : ""
+                          }`}
+                          onClick={() => handleLevelSelect(index + 1)}
+                        >
+                          {level}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>

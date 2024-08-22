@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const Modal = ({ isOpen, onClose, children }) => {
   const [visible, setVisible] = useState(false);
@@ -9,25 +9,32 @@ const Modal = ({ isOpen, onClose, children }) => {
       setIsSmallScreen(window.innerWidth <= 1200);
     };
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
     return () => {
-      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener("resize", checkScreenSize);
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (isOpen && !isSmallScreen) {
+  //     setVisible(true);
+  //     const timer = setTimeout(() => {
+  //       setVisible(false);
+  //       setTimeout(onClose, 500);
+  //     }, 7000);
+
+  //     return () => clearTimeout(timer);
+  //   } else {
+  //     setVisible(false);
+  //   }
+  // }, [isOpen, onClose, isSmallScreen]);
   useEffect(() => {
     if (isOpen && !isSmallScreen) {
       setVisible(true);
-      const timer = setTimeout(() => {
-        setVisible(false);
-        setTimeout(onClose, 500); 
-      }, 7000);
-
-      return () => clearTimeout(timer);
     } else {
       setVisible(false);
     }
-  }, [isOpen, onClose, isSmallScreen]);
+  }, [isOpen, isSmallScreen]);
 
   if (!isOpen && !visible) return null;
 
@@ -36,25 +43,25 @@ const Modal = ({ isOpen, onClose, children }) => {
       className="modal-container"
       onClick={() => {
         setVisible(false);
-        setTimeout(onClose, 500); 
+        setTimeout(onClose, 500);
       }}
       style={{
-        position: "fixed", 
-        bottom: 0, 
+        position: "fixed",
+        bottom: 0,
         right: 0,
-        display: isSmallScreen ? 'none' : 'flex',
-        alignItems: "flex-end", 
+        display: isSmallScreen ? "none" : "flex",
+        alignItems: "flex-end",
         justifyContent: "flex-end",
         zIndex: 1000,
-        transition: 'opacity 0.5s ease-in-out',
+        transition: "opacity 0.5s ease-in-out",
         opacity: visible ? 1 : 0,
-        paddingBottom: '80px', 
-        paddingRight: '30px', 
-        width: '20%'
+        paddingBottom: "80px",
+        paddingRight: "30px",
+        width: "20%",
       }}
     >
       <div
-        onClick={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
         style={{
           background: "white",
           width: 250,
@@ -62,21 +69,21 @@ const Modal = ({ isOpen, onClose, children }) => {
           border: "1px solid #000",
           borderRadius: "5px",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-          position: 'relative'
+          position: "relative",
         }}
       >
         <button
           onClick={() => {
             setVisible(false);
-            setTimeout(onClose, 500); 
+            setTimeout(onClose, 500);
           }}
           style={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
           }}
         >
           <svg
