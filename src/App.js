@@ -124,19 +124,19 @@ function App() {
           case 1:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission easier, since this is a level 1"
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission easier, since this is a level 1.Please generate the mission only one and after the student complete that one mission another will generate."
             );
             break;
           case 2:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission a little hard, since this is a level 2"
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission a little hard, since this is a level 2. Please generate the mission only one and after the student complete that one mission another will generate."
             );
             break;
           case 3:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission hard, since this is a level 3"
+              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission hard, since this is a level 3. Please generate the mission only one and after the student complete that one mission another will generate."
             );
             break;
           default:
