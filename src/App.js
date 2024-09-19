@@ -32,6 +32,7 @@ import { Live2DModel } from "pixi-live2d-display/dist/cubism4.js";
 // const { Live2DModel } = require("pixi-live2d-display/dist/cubism4.js");
 import { useHotkeys } from "react-hotkeys-hook";
 import Modal from "./components/Modal";
+import CustomRadioButton from "./components/language";
 
 window.PIXI = PIXI;
 
@@ -54,7 +55,8 @@ function App() {
   const [open, setOpen] = useState(true);
   const [showLevel, setShowLevel] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(0);
-
+  const [selectedValue, setSelectedValue] = useState("english");
+  const [language, setLanguage] = useState("please respond in english");
   const handleClose = () => {
     setOpen(false);
   };
@@ -62,6 +64,14 @@ function App() {
   const handleOpen = () => {
     setOpen(true);
   };
+
+  useEffect(() => {
+    if (selectedValue === "english") {
+      setLanguage("please respond in English");
+    } else if (selectedValue === "japanese") {
+      setLanguage("please respond in Japanese");
+    }
+  }, [selectedValue, language]);
 
   useEffect(() => {
     const app = new PIXI.Application({
@@ -124,19 +134,19 @@ function App() {
           case 1:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission easier, since this is a level 1.Please generate the mission only one and after the student complete that one mission another will generate."
+              `You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission easier, since this is a level 1.Please generate the mission only one and after the student complete that one mission another will generate.`
             );
             break;
           case 2:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission a little hard, since this is a level 2. Please generate the mission only one and after the student complete that one mission another will generate."
+              `You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission a little hard, since this is a level 2. Please generate the mission only one and after the student complete that one mission another will generate.`
             );
             break;
           case 3:
             setGeneratedText("");
             firstSend(
-              "You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission hard, since this is a level 3. Please generate the mission only one and after the student complete that one mission another will generate."
+              `You are a teacher who pretends to be a barista from a cafe called 'Nakama'. Before we start communicating, I want you to generate a set of missions for the student to follow, things that the student have to talk to you, and when the student complete those mission I want you to give them feedback, improvements. Remember to make it short, no longer than 50 words in each response. Please make the mission hard, since this is a level 3. Please generate the mission only one and after the student complete that one mission another will generate.`
             );
             break;
           default:
@@ -147,25 +157,24 @@ function App() {
       setGeneratedText("");
       setMessages([
         {
-          message:
-            "Hello! As a teacher from the University of Tokyo, I'm here to help and provide information. If you have any questions or need assistance with any educational or academic topics, please feel free to ask.",
+          message: `Hello! As a teacher from the University of Tokyo, I'm here to help and provide information. If you have any questions or need assistance with any educational or academic topics, please feel free to ask.`,
           sender: "user",
         },
       ]);
     } else if (selectedTheme === 3 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
-        "Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level."
+        `Please generate a English sentence (atleast 10 words) for the user to practice their speaking. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.`
       );
     } else if (selectedTheme === 4 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
-        "Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level."
+        `Please generate a English sentence (at least 30 words) for the user to practice their speaking. Make sure the level of the words a little harder to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.`
       );
     } else if (selectedTheme === 5 && selectedItem === 1) {
       setGeneratedText("");
       firstSend(
-        "Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level."
+        `Please generate a English sentence (at least 50 words) for the user to practice their speaking. Make sure the level of the words complicated to pronoun. After users input their voice, please give advice and then generate another one. You check whether the user pronunciation is correct. If you think the accuracy of the user pronunciation exceeds 80%, you can just create another sentence for them to practice. Also, the advice should only about the words they have trouble pronoun with. So after a while, if the user pronunciation is great, tell them to move on to the next level.`
       );
     }
 
@@ -173,7 +182,7 @@ function App() {
       setGeneratedText("");
       setMessages([
         {
-          message: "こんにちは。何か相談したいことはありますか?",
+          message: `こんにちは。何か相談したいことはありますか?`,
           sender: "user",
         },
       ]);
@@ -182,8 +191,7 @@ function App() {
       setGeneratedText("");
       setMessages([
         {
-          message:
-            "ちょっと、そこ！なかまカフェへようこそ。今日はどのようにお手伝いできますか?",
+          message: `ちょっと、そこ！なかまカフェへようこそ。今日はどのようにお手伝いできますか?`,
           sender: "user",
         },
       ]);
@@ -192,25 +200,24 @@ function App() {
       setGeneratedText("");
       setMessages([
         {
-          message:
-            "「こんにちは！ 東京大学の教師として、私は情報を提供し、お手伝いするためにここにいます。教育上または学術上のトピックについてご質問やサポートが必要な場合は、お気軽にお問い合わせください。」,",
+          message: `「こんにちは！ 東京大学の教師として、私は情報を提供し、お手伝いするためにここにいます。教育上または学術上のトピックについてご質問やサポートが必要な場合は、お気軽にお問い合わせください。」,`,
           sender: "user",
         },
       ]);
     } else if (selectedItem === 0 && selectedTheme === 3) {
       setGeneratedText("");
       firstSend(
-        "ユーザーがスピーキングを練習できるように、日本語の文章 (少なくとも 10 単語) を生成してください。ユーザーが声を入力したら、アドバイスを与えてから、別のアドバイスを生成してください。ユーザーの発音が正しいかどうかをチェックします。必ず日本語でのみ応答してください"
+        `ユーザーがスピーキングを練習できるように、日本語の文章 (少なくとも 10 単語) を生成してください。ユーザーが声を入力したら、アドバイスを与えてから、別のアドバイスを生成してください。ユーザーの発音が正しいかどうかをチェックします。必ず日本語でのみ応答してください`
       );
     } else if (selectedItem === 0 && selectedTheme === 4) {
       setGeneratedText("");
       firstSend(
-        "「ユーザーがスピーキングの練習をするために、日本語の文（少なくとも 30 単語）を生成してください。単語のレベルは発音が少し難しいようにしてください。ユーザーが音声を入力した後、アドバイスを与えてから、別の文を生成してください。チェックを入れます。」ユーザーの発音が正しいかどうか。」"
+        `「ユーザーがスピーキングの練習をするために、日本語の文（少なくとも 30 単語）を生成してください。単語のレベルは発音が少し難しいようにしてください。ユーザーが音声を入力した後、アドバイスを与えてから、別の文を生成してください。チェックを入れます。」ユーザーの発音が正しいかどうか。」`
       );
     } else if (selectedItem === 0 && selectedTheme === 5) {
       setGeneratedText("");
       firstSend(
-        "「ユーザーのスピーキング練習に役立つ日本語の文, 50 語以上 を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」"
+        `「ユーザーのスピーキング練習に役立つ日本語の文, 50 語以上 を生成します。単語に複雑な発音があることを確認してください。ユーザーが音声を入力した後にアドバイスを与えます。フィードバックを提供したら、ユーザーが練習できるように別の複雑な文を生成します。 。」`
       );
     }
   }, [selectedTheme, selectedItem, selectedLevel]);
@@ -239,7 +246,7 @@ function App() {
   const firstSend = async (message) => {
     const systemMessage = {
       role: "system",
-      content: message,
+      content: message + language,
     };
 
     const apiRequestBody = {
@@ -1150,7 +1157,7 @@ function App() {
     }
     const systemMessage = {
       role: "system",
-      content: content,
+      content: content + language,
       // content:
       // 	"Pretend you are my teacher and response in Japanese. Please provide the english version below the japanese version",
     };
@@ -1506,6 +1513,21 @@ function App() {
                 <TextToSpeech generatedText={generatedText} />
                 {/* <LanguageDropdown /> */}
               </div>
+            </div>
+
+            <div className="languageSelector">
+              <p className="languageTitle">Response: </p>
+
+              <CustomRadioButton
+                label="English"
+                selected={selectedValue === "english"}
+                onSelect={() => setSelectedValue("english")}
+              />
+              <CustomRadioButton
+                label="Japanese"
+                selected={selectedValue === "japanese"}
+                onSelect={() => setSelectedValue("japanese")}
+              />
             </div>
             <div>
               <CSVLink

@@ -215,7 +215,16 @@ code {
 
 }
 
+.languageSelector {
+  flex-direction: column;
+  display: flex;
+  position: relative;
+  padding-left: 25px;
+}
 
+.languageTitle {
+  display: flex;
+}
 /* Media query for responsiveness */
 @media (min-width: 1200px) {
   /* On screens with minimum width of 768px (e.g., tablets and larger screens) */
@@ -232,6 +241,7 @@ code {
   .chatContainer {
     width: 70%;
   }
+
 }
 
 @media (max-width: 1200px) {
@@ -243,6 +253,11 @@ code {
   .textToSpeechContainer {
     width: 100%
   }
+
+  .languageSelector {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 @media (max-width: 480px) {
@@ -253,4 +268,11 @@ code {
   .textToSpeechContainer {
     width: 100%
   }
+
+  .languageSelector {
+    display: flex;
+    flex-direction: row;
+  }
 }
+
+

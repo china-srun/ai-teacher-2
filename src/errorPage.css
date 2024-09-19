@@ -1,0 +1,137 @@
+@import url("https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300&display=swap");
+
+.wrapper {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  align-items: center;
+  background: #eee;
+}
+
+.wrapper .text_group .text_404 {
+  font-family: "Comic Neue", cursive;
+  font-size: 5em;
+  box-sizing: border-box;
+  color: #363636;
+}
+
+.wrapper .text_group .text_lost {
+  font-family: "Comic Neue", cursive;
+  font-size: 2em;
+  line-height: 50px;
+  box-sizing: border-box;
+  color: #565656;
+}
+
+.wrapper .window_group .window_404 {
+  width: 200px;
+  height: 350px;
+  border-radius: 100px;
+  box-shadow: -3px -3px 0px 5px rgba(212, 212, 212, 1),
+    5px 5px 0px 2px rgba(255, 255, 255, 1);
+  background: linear-gradient(
+    310deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 9, 107, 1) 0%,
+    rgba(0, 0, 0, 1) 80%
+  );
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.wrapper .window_group .window_404 .stars {
+  display: flex;
+  width: 200%; /* Ensure this width is twice the width of the viewport to handle seamless scrolling */
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: flyby 30s linear infinite;
+}
+
+.wrapper .window_group .window_404 .stars .star {
+  border-radius: 100%;
+  background: #ffffff;
+  position: absolute;
+  width: 3px; /* Increased size for better visibility */
+  height: 3px; /* Increased size for better visibility */
+}
+
+
+
+
+.wrapper .window_group .window_404 .stars .star:nth-of-type(1) { width: 1px; height: 1px; left: 142px; top: 30px; animation: twinkle1 13s linear infinite; animation-delay: 11s; }
+.wrapper .window_group .window_404 .stars .star:nth-of-type(2) { width: 1px; height: 1px; left: 251px; top: 43px; animation: twinkle2 9s linear infinite; animation-delay: 8s; }
+.wrapper .window_group .window_404 .stars .star:nth-of-type(3) { width: 1px; height: 1px; left: 16px; top: 83px; animation: twinkle3 10s linear infinite; animation-delay: 13s; }
+/* ... repeat for all stars up to 100 with unique sizes, positions, and animations ... */
+
+.wrapper .window_group .window_404 .stars .star:before {
+  content: "";
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  filter: blur(1px);
+}
+
+@keyframes flyby {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@media only screen and (min-width: 1080px) {
+  .wrapper .text_group {
+    flex: 0 0 30%;
+    margin-left: 25%;
+    align-items: flex-end;
+  }
+  .wrapper .window_group {
+    flex: 1 0 40%;
+    margin-top: 0;
+    margin-left: 5%;
+  }
+}
+
+@media only screen and (max-width: 1079px) {
+  .wrapper .text_group {
+    flex: 0 0 100%;
+    margin: 0;
+    align-items: center;
+  }
+  .wrapper .text_group .text_lost {
+    width: 100%;
+    padding: 0 22px;
+    font-size: 1.7em;
+    line-height: 35px;
+  }
+  .wrapper .window_group {
+    flex: 0 0 100%;
+  }
+  .wrapper .window_group .window_404 {
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+  }
+}
+
+@keyframes twinkle1 {
+  0% { transform: scale(1, 1); }
+  10% { transform: scale(0.3, 0.3); }
+  20% { transform: scale(1, 1); }
+  30% { transform: scale(0.5, 0.5); }
+  40% { transform: scale(1, 1); }
+  100% { transform: scale(1, 1); }
+}
+
+
+
+/* Repeat @keyframes for twinkle2 to twinkle100 with unique timing and transformations */
