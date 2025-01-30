@@ -19,6 +19,10 @@ import {
   TypingIndicator,
   ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { db } from "../src/libs/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Amplify, Predictions } from "aws-amplify";
 import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
@@ -33,13 +37,189 @@ import { Live2DModel } from "pixi-live2d-display/dist/cubism4.js";
 import { useHotkeys } from "react-hotkeys-hook";
 import Modal from "./components/Modal";
 import CustomRadioButton from "./components/language";
-
+import emailjs from "@emailjs/browser";
+emailjs.init({
+  publicKey: "OBQBNn5U_qbZj7iB5",
+  // Do not allow headless browsers
+  blockHeadless: true,
+  blockList: {
+    // Block the suspended emails
+    list: ["foo@emailjs.com", "bar@emailjs.com"],
+    // The variable contains the email address
+    watchVariable: "china.srunn@gmail.com",
+  },
+  limitRate: {
+    // Set the limit rate for the application
+    id: "app",
+    // Allow 1 request per 10s
+    throttle: 10000,
+  },
+});
 window.PIXI = PIXI;
 
 Live2DModel.registerTicker(PIXI.Ticker);
 
 Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
+
+const CSVDialog = ({ isOpen, onClose, messages }) => {
+  const [emails, setEmails] = useState([]);
+  const [emailInput, setEmailInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      if (isOpen) {
+        setIsLoading(true);
+        try {
+          const querySnapshot = await getDocs(collection(db, "teacher_emails"));
+          const emailList = querySnapshot.docs.map((doc) => doc.data().email);
+          setEmails(emailList);
+        } catch (error) {
+          console.error("Error fetching emails from Firebase:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchEmails();
+  }, [isOpen]);
+
+  // Generate CSV data dynamically from messages
+  const generateCsvData = () => {
+    const csvData = [["AiTeacher", "Student"]];
+    for (let i = 0; i < messages.length; i++) {
+      if (i % 2 === 0) {
+        csvData.push([messages[i].message.replace(/[^\w\s\n]/g, ""), ""]);
+      } else {
+        csvData.push(["", messages[i].message.replace(/[^\w\s\n]/g, "")]);
+      }
+    }
+    return csvData.map((row) => row.join(",")).join("\n");
+  };
+
+  const handleEmailInputChange = (event) => {
+    setEmailInput(event.target.value);
+  };
+
+  const handleAddEmail = async () => {
+    if (!emailInput || !emailInput.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "teacher_emails"), { email: emailInput });
+      setEmails((prevEmails) => [...prevEmails, emailInput]);
+      setEmailInput("");
+    } catch (error) {
+      console.error("Error adding email to Firebase:", error);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    if (!emailInput || !emailInput.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    const csvContent = generateCsvData();
+    const blob = new Blob([csvContent], { type: "text/csv" });
+
+    // 🔹 Upload to Firebase Storage
+    const storageRef = getStorage();
+    const fileRef = ref(storageRef, `csv-files/chat-history-${Date.now()}.csv`);
+
+    try {
+      const snapshot = await uploadBytes(fileRef, blob);
+      const fileUrl = await getDownloadURL(snapshot.ref); // ✅ Get the download URL
+
+      // 🔹 Send email with the file URL instead of attaching the file
+      const templateParams = {
+        to_email: emailInput,
+        download_link: fileUrl, // ✅ Send the link instead of file data
+        message: "Click the link below to download your CSV file:",
+      };
+
+      await emailjs.send(
+        "service_zx039uf",
+        "template_urmuzuu",
+        templateParams,
+        "OBQBNn5U_qbZj7iB5"
+      );
+      console.log(fileUrl)
+      alert("Email sent successfully with the CSV download link!");
+    } catch (error) {
+      console.error("Error uploading file or sending email:", error);
+      alert("Failed to send email.");
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="dialog-overlay">
+      <div className="dialog-container">
+        <h2 className="dialog-title">Generate CSV File</h2>
+        <p className="dialog-message">
+          Select an email or add a new one to receive the CSV file. The file
+          will be attached to the email.
+        </p>
+
+        <div className="dialog-email-input">
+          <label htmlFor="email-input" className="dialog-label">
+            Enter Email:
+          </label>
+          <input
+            id="email-input"
+            type="email"
+            value={emailInput}
+            onChange={handleEmailInputChange}
+            placeholder="Type to search or add email"
+            className="dialog-input"
+          />
+          <button
+            className="dialog-button add-button"
+            onClick={handleAddEmail}
+            disabled={!emailInput || !emailInput.includes("@")}
+          >
+            Add Email
+          </button>
+        </div>
+
+        {isLoading ? (
+          <p>Loading emails...</p>
+        ) : (
+          <ul className="dialog-email-list">
+            {emails.map((email, index) => (
+              <li
+                key={index}
+                className="dialog-email-item"
+                onClick={() => setEmailInput(email)}
+              >
+                {email}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="dialog-actions">
+          <button className="dialog-button cancel-button" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="dialog-button confirm-button"
+            onClick={handleSendEmail}
+            disabled={!emailInput || !emailInput.includes("@")}
+          >
+            Send Email
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [selectedItem, setSelectedItem] = useState(1);
@@ -57,6 +237,8 @@ function App() {
   const [selectedLevel, setSelectedLevel] = useState(0);
   const [selectedValue, setSelectedValue] = useState("english");
   const [language, setLanguage] = useState("please respond in english");
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -1378,6 +1560,20 @@ function App() {
     csvLink.current.link.click();
   }
 
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleConfirmDialog = () => {
+    setDialogOpen(false);
+    console.log("CSV Generated!"); // Replace this with your CSV generation logic
+    generateCsv();
+  };
+
   var animationFrameId = null;
 
   function startMouthAnimation() {
@@ -1585,7 +1781,7 @@ function App() {
                       placeholder="Type message here"
                       onSend={handleSend}
                       // autoFocus
-                      onAttachClick={() => generateCsv()}
+                      onAttachClick={() => handleOpenDialog()}
                       attachButton={true}
                     ></MessageInput>
                   </div>
@@ -1596,6 +1792,11 @@ function App() {
         </div>
       </div>
       <div>
+        <CSVDialog
+          isOpen={isDialogOpen}
+          onClose={handleCloseDialog}
+          messages={messages} // Pass messages as a prop
+        />
         <Modal isOpen={open} onClose={handleClose} className="modal-container">
           <>
             <h3 style={{ marginBottom: "10px" }}>Keyboard Shortcuts</h3>
