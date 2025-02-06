@@ -62,10 +62,13 @@ Live2DModel.registerTicker(PIXI.Ticker);
 Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
-const CSVDialog = ({ isOpen, onClose, messages }) => {
+const CSVDialog = ({ isOpen, onClose, messages, evaluatedConversation }) => {
   const [emails, setEmails] = useState([]);
   const [emailInput, setEmailInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [language, setLanguage] = useState("en");
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -89,6 +92,8 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
   // Generate CSV data dynamically from messages
   const generateCsvData = () => {
     const csvData = [["AiTeacher", "Student"]];
+
+    // Add messages to CSV table
     for (let i = 0; i < messages.length; i++) {
       if (i % 2 === 0) {
         csvData.push([messages[i].message.replace(/[^\w\s\n]/g, ""), ""]);
@@ -96,7 +101,33 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
         csvData.push(["", messages[i].message.replace(/[^\w\s\n]/g, "")]);
       }
     }
-    return csvData.map((row) => row.join(",")).join("\n");
+
+    // Convert the table data to CSV format
+    let csvContent = csvData.map((row) => row.join(",")).join("\n");
+
+    // Add evaluated conversation outside of the table
+    if (evaluatedConversation) {
+      const englishText = evaluatedConversation.english;
+      const japaneseText = evaluatedConversation.japanese;
+
+      // Add a separator for better clarity
+      csvContent += `\nEvaluated Conversation (English):,${englishText}`;
+      csvContent += `\nEvaluated Conversation (Japanese):,${japaneseText}`;
+    }
+
+    return csvContent;
+  };
+
+  // Handle CSV file download
+  const handleDownloadCsv = () => {
+    const csvContent = generateCsvData();
+    const blob = new Blob([csvContent], { type: "text/csv" });
+
+    // Create a link to download the CSV
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `chat-history-${Date.now()}.csv`; // Set the filename with a timestamp
+    link.click(); // Programmatically click the link to trigger the download
   };
 
   const handleEmailInputChange = (event) => {
@@ -104,8 +135,28 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
   };
 
   const handleAddEmail = async () => {
-    if (!emailInput || !emailInput.includes("@")) {
+    // Check if the email is empty or doesn't contain "@"
+    if (
+      !emailInput ||
+      !emailInput.includes("@") ||
+      emailInput.indexOf("@") === emailInput.length - 1
+    ) {
       alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Check if the email ends with .com (can be extended to other domains like .org, .net, etc.)
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(emailInput)) {
+      alert(
+        "Please enter a valid email address with a proper domain (e.g., example@domain.com)."
+      );
+      return;
+    }
+
+    // Prevent adding if the email already exists
+    if (emails.includes(emailInput)) {
+      alert("This email already exists.");
       return;
     }
 
@@ -132,6 +183,7 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
     const fileRef = ref(storageRef, `csv-files/chat-history-${Date.now()}.csv`);
 
     try {
+      setIsProcessing(true); // set processing to true when sending email
       const snapshot = await uploadBytes(fileRef, blob);
       const fileUrl = await getDownloadURL(snapshot.ref); // ✅ Get the download URL
 
@@ -148,15 +200,30 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
         templateParams,
         "OBQBNn5U_qbZj7iB5"
       );
-      console.log(fileUrl)
+      console.log(fileUrl);
       alert("Email sent successfully with the CSV download link!");
     } catch (error) {
       console.error("Error uploading file or sending email:", error);
       alert("Failed to send email.");
+    } finally {
+      setIsProcessing(false); // reset processing after completion
     }
   };
 
+  useEffect(() => {
+    if (evaluatedConversation === "") {
+      setIsEvaluating(true); // Show loading icon if conversation is being processed
+    } else {
+      setIsEvaluating(false); // Hide loading icon once conversation is ready
+    }
+  }, [evaluatedConversation]);
+
   if (!isOpen) return null;
+
+  // Filter emails based on emailInput value
+  const filteredEmails = emails.filter((email) =>
+    email.toLowerCase().includes(emailInput.toLowerCase())
+  );
 
   return (
     <div className="dialog-overlay">
@@ -190,9 +257,11 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
 
         {isLoading ? (
           <p>Loading emails...</p>
+        ) : filteredEmails.length === 0 ? (
+          <p>No emails found. Please add an email.</p> // Show if no search results
         ) : (
           <ul className="dialog-email-list">
-            {emails.map((email, index) => (
+            {filteredEmails.map((email, index) => (
               <li
                 key={index}
                 className="dialog-email-item"
@@ -205,6 +274,19 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
         )}
 
         <div className="dialog-actions">
+          <button
+            className="dialog-button download-button"
+            onClick={handleDownloadCsv}
+            disabled={isEvaluating} // Disable the download button while evaluating
+          >
+            Download CSV
+          </button>
+          <button
+            className="dialog-button toggle-language-button"
+            onClick={() => setLanguage(language === "en" ? "jp" : "en")}
+          >
+            {language === "en" ? "Japanese" : "English"}
+          </button>
           <button className="dialog-button cancel-button" onClick={onClose}>
             Cancel
           </button>
@@ -216,6 +298,19 @@ const CSVDialog = ({ isOpen, onClose, messages }) => {
             Send Email
           </button>
         </div>
+
+        {isEvaluating ? (
+          <div className="loading-icon">
+            <p>Evaluating conversation...</p>
+            <div className="spinner"></div>
+          </div>
+        ) : (
+          <div className="evaluated-conversation">
+            {language === "en"
+              ? evaluatedConversation.english
+              : evaluatedConversation.japanese}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -238,6 +333,8 @@ function App() {
   const [selectedValue, setSelectedValue] = useState("english");
   const [language, setLanguage] = useState("please respond in english");
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [evaluatedConversation, setEvaluatedConversation] = useState("");
+  const [isEvaluated, setIsEvaluated] = useState(false); // Track if evaluation is done
 
   const handleClose = () => {
     setOpen(false);
@@ -403,6 +500,17 @@ function App() {
       );
     }
   }, [selectedTheme, selectedItem, selectedLevel]);
+
+  useEffect(() => {
+    if (isDialogOpen && messages.length > 0) {
+      const fetchEvaluatedConversation = async () => {
+        const evaluation = await evaluateConversation(messages);
+        setEvaluatedConversation(evaluation);
+      };
+
+      fetchEvaluatedConversation();
+    }
+  }, [isDialogOpen, messages]); // ✅ Runs every time isDialogOpen changes
 
   // useEffect(() => {
   // 	if (messages.length > 0) {
@@ -1415,6 +1523,67 @@ function App() {
     setGeneratedText("");
   }
 
+  async function evaluateConversation(chatMessage) {
+    const apiMessages = chatMessage.map((messageObject) => ({
+      role: messageObject.sender === "ChatGPT" ? "assistant" : "user",
+      content: messageObject.message,
+    }));
+
+    const systemMessage = {
+      role: "system",
+      content:
+        "You are an AI conversation evaluator. The student practices their speaking using audio in English. Since the audio is not available, analyze the text for clarity, engagement, coherence, and effectiveness. Provide specific feedback on what should be improved, what was done well, and how the user can have a better interaction with the AI. Keep your response concise, within 100 words.",
+    };
+
+    const apiRequestBody = {
+      model: "gpt-4o",
+      messages: [systemMessage, ...apiMessages],
+      max_tokens: 200,
+    };
+
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(apiRequestBody),
+    });
+
+    const data = await res.json();
+    const evaluationEnglish = data.choices[0].message.content;
+
+    // 🔹 Translate to Japanese
+    const translationRequest = {
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "Translate the following text into Japanese.",
+        },
+        { role: "user", content: evaluationEnglish },
+      ],
+      max_tokens: 200,
+    };
+
+    const translationRes = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(translationRequest),
+      }
+    );
+
+    const translationData = await translationRes.json();
+    const evaluationJapanese = translationData.choices[0].message.content;
+
+    return { english: evaluationEnglish, japanese: evaluationJapanese };
+  }
+
   const data = [
     { id: 0, label: "Japanese" },
     { id: 1, label: "English" },
@@ -1566,6 +1735,7 @@ function App() {
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
+    setEvaluatedConversation(""); // ✅ Reset when closing
   };
 
   const handleConfirmDialog = () => {
@@ -1796,6 +1966,7 @@ function App() {
           isOpen={isDialogOpen}
           onClose={handleCloseDialog}
           messages={messages} // Pass messages as a prop
+          evaluatedConversation={evaluatedConversation}
         />
         <Modal isOpen={open} onClose={handleClose} className="modal-container">
           <>
